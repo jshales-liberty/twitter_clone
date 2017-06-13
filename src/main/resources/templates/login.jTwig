@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<head>
+  		<title>JNT Messaging Login</title>
+  	</head>
+  	<body>
+  		<h2>Welcome to JNT Messaging</h2>
+  		<div>
+  			User Name: <input type="text" name="Uname">
+  			<br>
+  			<br>
+  			Password: <input type="password" name="psw"><br>
+  			<br>
+  			<button type="button">Log In</button>
+  			<button type="submit" value="newUser"><a href = "/createNewUser">New User</a></button>
+  		<div>
+  	<body>
+ </html>

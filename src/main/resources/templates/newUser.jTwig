@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+      <title>JNT Messaging New User</title>
+      <script>
+
+		
+	</script>
+    </head>
+    <body>
+      <h2>Create New User</h2>
+      <div>
+      	<form method = "POST">
+	        User Name: <input type="text" name="Uname">
+	        <br>
+	        <br>
+	        Password: <input type="password" name="psw"{6, }>
+	        <br>
+	        <br>
+	        First Name: <input type="text" name ="firstName">
+	        <br>
+	        <br>
+	        Last Name: <input type="text" name ="lastName">
+	        <br>
+	        <br>
+	        Birth Name: <input type="date" name ="bday">
+	        <br>
+	        <br>
+	        Email: <input type="text" name ="email">
+	        <br>
+	        <br>
+	        Bio: <textarea rows="4" cols="50"></textarea>
+	        <br>
+	        <br>
+	        <button type="submit" id="submit">Submit</button>
+	  	</form>
+      </div>
+    <body>
+ </html>
