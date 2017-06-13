@@ -3,7 +3,7 @@
   <groupId>TwitterClone</groupId>
   <artifactId>TwitterClone</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-</project>
+
   
       <repositories>
         <repository>
