@@ -11,10 +11,10 @@
       <h2>Create New User</h2>
       <div>
       	<form method = "POST">
-	        User Name: <input type="text" name="Uname">
+	        User Name: <input type="text" name="username">
 	        <br>
 	        <br>
-	        Password: <input type="password" name="psw"{6, }>
+	        Password: <input type="password" name="password"{6, }>
 	        <br>
 	        <br>
 	        First Name: <input type="text" name ="firstName">
@@ -23,13 +23,13 @@
 	        Last Name: <input type="text" name ="lastName">
 	        <br>
 	        <br>
-	        Birth Name: <input type="date" name ="bday">
+	        Birth Date: <input type="date" name ="birth_date">
 	        <br>
 	        <br>
 	        Email: <input type="text" name ="email">
 	        <br>
 	        <br>
-	        Bio: <textarea rows="4" cols="50"></textarea>
+	        Bio: <textarea rows="4" cols="50" name = "bio"></textarea>
 	        <br>
 	        <br>
 	        <button type="submit" id="submit">Submit</button>

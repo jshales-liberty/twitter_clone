@@ -22,6 +22,15 @@ public class Twitter {
 		});
 		
 		post("/createNewUser", (request, response) -> {
+			User user = new User(request.queryParams("firstName"),
+								request.queryParams("lastName"),
+								request.queryParams("username"),
+								request.queryParams("birth_date"),
+								request.queryParams("email"),
+								request.queryParams("bio"),
+								request.queryParams("password"));
+			
+			System.out.println(request.queryParams("lastName"));
 			return createLoginHTML();
 		});
 	}
