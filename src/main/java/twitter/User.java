@@ -15,6 +15,7 @@ public class User {
 	private String email_address;
 	private String birth_date;
 	private String bio;
+	private String password;
 
 	public int getId() {
 		return id;
@@ -24,6 +25,14 @@ public class User {
 		this.id = id;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 	public String getFirst_name() {
 		return first_name;
 	}
@@ -72,18 +81,19 @@ public class User {
 		this.bio = bio;
 	}
 
-	public User(int id, String first_name, String last_name, String username, String email_address, String birth_date, String bio) {
-		this.id = id;
+	public User(String first_name, String last_name, String username, String email_address, String birth_date, String bio, String password) {
+		this.id = 0;
 		this.first_name = first_name;
 		this.last_name = last_name;
 		this.username = username;
 		this.email_address = email_address;
 		this.birth_date = birth_date;
 		this.bio = bio;
+		this.password = password;
 		try {
-			String url = "jdbc:sqlite:tests.db";
+			String url = "jdbc:sqlite:twitterclone.db";
 			Connection conn = DriverManager.getConnection(url);
-			String sql = "INSERT INTO user_info(firstname, lastname, bio, birth_date, email_address, username) VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username) VALUES(?,?,?,?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql); 
 	            pstmt.setString(1, this.first_name);
 	            pstmt.setString(2, this.last_name);
