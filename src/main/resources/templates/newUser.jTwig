@@ -10,7 +10,7 @@
     <body>
       <h2>Create New User</h2>
       <div>
-      	<form method = "POST">
+      	<form action= "/createUser" method = "POST">
 	        User Name: <input type="text" name="username">
 	        <br>
 	        <br>

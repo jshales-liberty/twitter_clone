@@ -16,6 +16,7 @@ public class User {
 	private String birth_date;
 	private String bio;
 	private String password;
+	private String image;
 
 	public int getId() {
 		return id;
@@ -81,7 +82,7 @@ public class User {
 		this.bio = bio;
 	}
 
-	public User(String first_name, String last_name, String username, String email_address, String birth_date, String bio, String password) {
+	public User(String first_name, String last_name, String username, String email_address, String birth_date, String bio, String password, String image) {
 		this.id = 0;
 		this.first_name = first_name;
 		this.last_name = last_name;
@@ -90,6 +91,7 @@ public class User {
 		this.birth_date = birth_date;
 		this.bio = bio;
 		this.password = password;
+		this.image = image;
 		try {
 			String url = "jdbc:sqlite:twitterclone.db";
 			Connection conn = DriverManager.getConnection(url);
@@ -109,7 +111,7 @@ public class User {
 
 	public boolean checkCredentials(String username, String password) {
 		try {
-			String url = "jdbc:sqlite:tests.db";
+			String url = "jdbc:sqlite:twitterclone.db";
 			Connection conn = DriverManager.getConnection(url);
 			;
 			Statement stmt = conn.createStatement();
@@ -120,8 +122,5 @@ public class User {
 			System.out.println(e.getMessage());
 			return false;
 		}
-
 	}
-	
-
 }
