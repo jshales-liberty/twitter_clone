@@ -120,10 +120,11 @@ public class User {
 		String url = "jdbc:sqlite:twitterclone.db";
 		try (Connection conn = DriverManager.getConnection(url);
 				Statement stmt = conn.createStatement();) {
-			String query = "Select username, password from user_info where username = '"
-					+ this.username + "' and password = '" + this.password
-					+ "';";
-			ResultSet rs = stmt.executeQuery(query);
+			String sql = "Select username, password from user_info where username = ? and password = ?;";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, this.username);
+			pstmt.setString(2, this.password);
+			ResultSet rs = pstmt.executeQuery();
 			return (rs.getString("username").equals(this.getUsername()) &&
 			 rs.getString("password").equals(this.getPassword()));
 		} catch (SQLException e) {
