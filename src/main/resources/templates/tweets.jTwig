@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>JNT Messaging Tweets</title>
+      
+      <style>
+         header {
+          background-color:#262626;
+          width:100%;
+          height:50px;
+          box-shadow: 0px 1px 50px #5E5E5E;
+          position:fixed;
+          top:0px;
+          color: white;
+          z-index: 100;
+        }
+
+        .new_Tweet {
+          text-align: center;
+          padding: 1em;
+          overflow: hidden;
+          background-color: #d1d1e0;
+          box-shadow: 0px 1px 50px #5E5E5E;
+        }
+
+        .following_tweets {
+          text-align: center;
+          padding: 1em;
+          overflow: hidden;
+          background-color: #f0f0f5; 
+          box-shadow: 0px 1px 50px #5E5E5E;
+        }
+
+        .search {
+          margin-left: 20px;
+        }
+
+      </style>
+    </head>
+  <body>
+    <header>
+        <br>
+        <form method = "POST">
+          <input type="text" name ="search" class = "search">
+          <button type="submit" id="search">Search</button>
+        </form>
+    </header>
+        <br>
+        <br>
+        <br>
+        <section class = "new_Tweet">
+          <p>What's happening in your world?</p>
+          <textarea rows="1 " cols="120" name = "tweetTextArea" id = "tweetTextArea"></textarea>
+          <button type="submit" id="tweet">Tweet</button>
+        </section>
+      <br>
+        <section class = "following_tweets">
+          <p>Test</p>
+        
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </section>
+  </body>
+  <script>
+  	var tweet_button = document.getElementById('tweet');
+	tweet_button.onclick = function () {
+    	var xhr = new XMLHttpRequest();
+    	xhr.open('POST', '/submitTweet');
+    	xhr.setRequestHeader('Content-Type', 'application/json');
+    	xhr.onload = function() {
+        	if (xhr.status === 200) {
+            	console.log(xhr.responseText);
+        	} else if (xhr.status !== 200) {
+            	alert('Request failed.  Returned status of ' + xhr.status);
+        	}
+    	};
+    	var tweet = {tweet: document.getElementById('tweetTextArea').value};
+    	
+    	xhr.send(JSON.stringify(tweet));
+    };
+  </script> 
+ </html>

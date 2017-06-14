@@ -81,6 +81,7 @@ public class User {
 		this.bio = bio;
 	}
 
+
 	public User(String first_name, String last_name, String username,
 			String email_address, String birth_date, String bio,
 			String password) {
@@ -124,7 +125,5 @@ public class User {
 			System.out.println(e.getMessage());
 			return false;
 		}
-
 	}
-
 }
