@@ -7,6 +7,8 @@ import static spark.Spark.port;
 import org.jtwig.JtwigModel; 
 import org.jtwig.JtwigTemplate;
 
+import com.google.gson.Gson;
+
 public class Twitter {
 	public static void main(String[] args) {
 		
@@ -16,13 +18,20 @@ public class Twitter {
 			return createLoginHTML();
 		});
 		
+		 post("/login", (req, res) -> {
+	            String body = req.body();
+	            Gson gson = new Gson();
+	            User c = gson.fromJson(body, User.class);
+	            return c.checkCredentials();
+	        });
+		
 		get("/createNewUser", (request, response) -> {
 			System.out.println("get practice");
 			return createNewUserHTML();
 		});
 		
 		post("/createNewUser", (request, response) -> {
-			User user = new User(request.queryParams("firstName"),
+			new User(request.queryParams("firstName"),
 								request.queryParams("lastName"),
 								request.queryParams("username"),
 								request.queryParams("birth_date"),

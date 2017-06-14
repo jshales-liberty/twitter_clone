@@ -32,7 +32,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public String getFirst_name() {
 		return first_name;
 	}
@@ -81,7 +81,9 @@ public class User {
 		this.bio = bio;
 	}
 
-	public User(String first_name, String last_name, String username, String email_address, String birth_date, String bio, String password) {
+	public User(String first_name, String last_name, String username,
+			String email_address, String birth_date, String bio,
+			String password) {
 		this.id = 0;
 		this.first_name = first_name;
 		this.last_name = last_name;
@@ -93,35 +95,36 @@ public class User {
 		try {
 			String url = "jdbc:sqlite:twitterclone.db";
 			Connection conn = DriverManager.getConnection(url);
-			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username) VALUES(?,?,?,?,?,?)";
-			PreparedStatement pstmt = conn.prepareStatement(sql); 
-	            pstmt.setString(1, this.first_name);
-	            pstmt.setString(2, this.last_name);
-	            pstmt.setString(3, this.bio);
-	            pstmt.setString(4, this.birth_date);
-	            pstmt.setString(5, this.email_address);
-	            pstmt.setString(6, this.username);
-	            pstmt.executeUpdate();
+			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password) VALUES(?,?,?,?,?,?,?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, this.first_name);
+			pstmt.setString(2, this.last_name);
+			pstmt.setString(3, this.bio);
+			pstmt.setString(4, this.birth_date);
+			pstmt.setString(5, this.email_address);
+			pstmt.setString(6, this.username);
+			pstmt.setString(7, this.password);
+			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	public boolean checkCredentials(String username, String password) {
-		try {
-			String url = "jdbc:sqlite:tests.db";
-			Connection conn = DriverManager.getConnection(url);
-			;
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(
-					"Select username, password from user_info where username = " + username + "and password = " + password + ";");
-			return (rs.getString("username") == username && rs.getString("password") == password);
+	public boolean checkCredentials() {
+		String url = "jdbc:sqlite:twitterclone.db";
+		try (Connection conn = DriverManager.getConnection(url);
+				Statement stmt = conn.createStatement();) {
+			String query = "Select username, password from user_info where username = '"
+					+ this.username + "' and password = '" + this.password
+					+ "';";
+			ResultSet rs = stmt.executeQuery(query);
+			return (rs.getString("username").equals(this.getUsername()) &&
+			 rs.getString("password").equals(this.getPassword()));
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			return false;
 		}
 
 	}
-	
 
 }
