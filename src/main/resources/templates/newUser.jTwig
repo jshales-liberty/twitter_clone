@@ -32,6 +32,9 @@
 	        Bio: <textarea rows="4" cols="50" name = "bio"></textarea>
 	        <br>
 	        <br>
+	        <input type="file" name="pic" accept="image/*">
+	        <br>
+	        <br>
 	        <button type="submit" id="submit">Submit</button>
 	  	</form>
       </div>
