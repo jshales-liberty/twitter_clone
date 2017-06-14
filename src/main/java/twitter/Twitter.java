@@ -74,10 +74,7 @@ public class Twitter {
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
             
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            
-            System.out.println(timestamp);
-            System.out.println(tweet.getTweet());
+            new Tweet(tweet.getTweet(), "1");
             
             return "jsonpost";
         });

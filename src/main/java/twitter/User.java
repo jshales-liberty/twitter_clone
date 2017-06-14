@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 public class User {
 	private int id;
@@ -93,10 +94,13 @@ public class User {
 		this.birth_date = birth_date;
 		this.bio = bio;
 		this.password = password;
-		try {
-			String url = "jdbc:sqlite:twitterclone.db";
-			Connection conn = DriverManager.getConnection(url);
-			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password) VALUES(?,?,?,?,?,?,?)";
+		
+		String url = "jdbc:sqlite:twitterclone.db";
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String stringTimeStamp = timestamp.toString();
+		
+		try (Connection conn = DriverManager.getConnection(url)){
+			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_date) VALUES(?,?,?,?,?,?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, this.first_name);
 			pstmt.setString(2, this.last_name);
@@ -105,6 +109,7 @@ public class User {
 			pstmt.setString(5, this.email_address);
 			pstmt.setString(6, this.username);
 			pstmt.setString(7, this.password);
+			pstmt.setString(8, stringTimeStamp);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
