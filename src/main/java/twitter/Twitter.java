@@ -38,7 +38,7 @@ public class Twitter {
 	            User c = gson.fromJson(body, User.class);
 	            return c.checkCredentials();
 	        });
-		
+					
 		get("/createNewUser", (request, response) -> {
 			return createNewUserHTML();
 		});
@@ -88,8 +88,21 @@ public class Twitter {
             
             return "jsonpost";
         });
+		
+		 get("/logoff", (req, res) -> {
+			 req.session().attribute("username","Good-bye");
+			 return createlogOffPageHTML(req.session().attribute("username"));
+		 });
+			          
 	}
 	
+	private static String createlogOffPageHTML(String username) {
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logOff.jTwig");
+        JtwigModel model = JtwigModel.newModel().with("username", username);
+
+		return template.render(model);
+	}
+
 	public static String createLoginHTML(){
 		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jTwig");
         JtwigModel model = JtwigModel.newModel();
