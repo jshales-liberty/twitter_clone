@@ -97,38 +97,54 @@ public class User {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 
-		
-		try (Connection conn = DriverManager.getConnection(url)){
-			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, this.first_name);
-			pstmt.setString(2, this.last_name);
-			pstmt.setString(3, this.bio);
-			pstmt.setString(4, this.birth_date);
-			pstmt.setString(5, this.email_address);
-			pstmt.setString(6, this.username);
-			pstmt.setString(7, this.password);
-			pstmt.setString(8, stringTimeStamp);
-			pstmt.executeUpdate();
+		try (Connection conn = DriverManager.getConnection(url);
+				PreparedStatement pstmt_validate = conn.prepareStatement(
+						"Select username from user_info where username = ? OR email_address = ?");) {
+			pstmt_validate.setString(1, this.username);
+			pstmt_validate.setString(2, this.email_address);
+			int i = pstmt_validate.executeUpdate();
+			pstmt_validate.close();
+			PreparedStatement pstmt_create = conn.prepareStatement(
+					"INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");
+
+			if (i <= 0) {
+				pstmt_create.setString(1, this.first_name);
+				pstmt_create.setString(2, this.last_name);
+				pstmt_create.setString(3, this.bio);
+				pstmt_create.setString(4, this.birth_date);
+				pstmt_create.setString(5, this.email_address);
+				pstmt_create.setString(6, this.username);
+				pstmt_create.setString(7, this.password);
+				pstmt_create.setString(8, stringTimeStamp);
+				pstmt_create.executeUpdate();
+			} else {
+				System.out.println("User already exists");
+			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	public boolean checkCredentials() {
+	public int checkCredentials() {
 		String url = "jdbc:sqlite:twitterclone.db";
-		
+
 		try (Connection conn = DriverManager.getConnection(url);
 				PreparedStatement pstmt = conn.prepareStatement(
-						"Select username, password from user_info where username = ? and password = ?;");) {
+						"Select username, password, user_id from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, this.username);
 			pstmt.setString(2, this.password);
+			System.out.println("here");
 			ResultSet rs = pstmt.executeQuery();
-			return (rs.getString("username").equals(this.getUsername())
-					&& rs.getString("password").equals(this.getPassword()));
+			if (rs.isBeforeFirst())
+			{String result = rs.getString("user_id");
+				return Integer.parseInt(result);
+			} else {
+				return -1; //no user_id
+			}
+
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-			return false;
+			return -1;
 		}
 	}
 }

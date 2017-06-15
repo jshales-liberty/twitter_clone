@@ -12,7 +12,13 @@ button.onclick = function () {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
         if (xhr.status === 200) {
-            console.log(xhr.responseText);
+            if ((xhr.responseText=='true') == true) {
+            console.log("trying");
+            	window.location = "/createTweetHTML";
+            } else {
+            	document.getElementById('output').innerHTML="Login Incorrect";
+            	;
+            }
         } else if (xhr.status !== 200) {
             alert('Request failed.  Returned status of ' + xhr.status);
         }
@@ -31,7 +37,7 @@ button.onclick = function () {
         Password: <input type="password" id="password" name="password"><br>
         <br>
         <button type="submit" id= "login_button">Log In</button>
-        <button type="submit" value="newUser"><a href = "/createNewUser">New User</a></button>
+        <button type="submit" value="newUser"><a href = "/createUser">New User</a></button>
       <div>
       <div id="output">
       here
