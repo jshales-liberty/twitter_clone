@@ -159,7 +159,6 @@ public class Twitter {
         });
 		
 		 get("/logoff", (req, res) -> {
-			 req.session().attribute("username","Good-bye");
 			 return createlogOffPageHTML(req.session().attribute("username"));
 		 });
 			          
