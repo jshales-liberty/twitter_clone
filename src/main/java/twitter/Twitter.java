@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import static spark.Spark.port;
 
 import org.jtwig.JtwigModel; 
@@ -19,6 +21,8 @@ import org.jtwig.JtwigTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class Twitter {
 	
@@ -87,6 +91,46 @@ public class Twitter {
             new Tweet(tweet.getTweet(), "1");
             
             return "jsonpost";
+        });	
+		
+		post("/submitFollow", (req, res) -> {
+			String body = req.body();
+            Gson gson = new Gson();
+            System.out.println(body);
+           
+            JsonParser parser = new JsonParser();
+            JsonObject obj = parser.parse(body).getAsJsonObject();
+            String user = obj.get("user").getAsString();
+            String follows = obj.get("follows").getAsString();
+            
+            System.out.println(user + " " + follows);
+            
+			String url = "jdbc:sqlite:twitterclone.db";
+			
+			String selectSql = "SELECT user_id FROM user_info WHERE username = ?";
+			String insertSql = "INSERT INTO follower(user_id, follows_user_id, create_timestamp) VALUES(?,?,?)";
+			
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			String stringTimeStamp = timestamp.toString();
+			
+			try (Connection conn = DriverManager.getConnection(url);
+				PreparedStatement pstmtSelect = conn.prepareStatement(selectSql);
+				PreparedStatement pstmtInsert = conn.prepareStatement(insertSql);){
+				
+					pstmtSelect.setString(1, obj.get("follows").getAsString());
+					ResultSet rs = pstmtSelect.executeQuery();
+					int followsId = rs.getInt("user_id");
+					System.out.println(followsId);
+					
+					pstmtInsert.setInt(1, obj.get("user").getAsInt());
+					pstmtInsert.setInt(2, followsId);
+					pstmtInsert.setString(3, stringTimeStamp);
+					pstmtInsert.executeUpdate();
+					
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+			return req;
         });
 	}
 	
@@ -122,7 +166,6 @@ public class Twitter {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()){
 				popularTweeters.add(rs.getString("username"));
-				System.out.println(popularTweeters.size());
 			}
 			return popularTweeters;
 		} catch (SQLException e) {
@@ -130,6 +173,4 @@ public class Twitter {
 			return popularTweeters;
 		}	
 	}
-	
-	
 }
