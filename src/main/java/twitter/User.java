@@ -82,7 +82,6 @@ public class User {
 		this.bio = bio;
 	}
 
-
 	public User(String first_name, String last_name, String username,
 			String email_address, String birth_date, String bio,
 			String password) {
@@ -94,10 +93,11 @@ public class User {
 		this.birth_date = birth_date;
 		this.bio = bio;
 		this.password = password;
-		
+
 		String url = "jdbc:sqlite:twitterclone.db";
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
+
 		
 		try (Connection conn = DriverManager.getConnection(url)){
 			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)";
@@ -120,14 +120,13 @@ public class User {
 		String url = "jdbc:sqlite:twitterclone.db";
 		
 		try (Connection conn = DriverManager.getConnection(url);
-				Statement stmt = conn.createStatement();) {
-			String sql = "Select username, password from user_info where username = ? and password = ?;";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+				PreparedStatement pstmt = conn.prepareStatement(
+						"Select username, password from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, this.username);
 			pstmt.setString(2, this.password);
 			ResultSet rs = pstmt.executeQuery();
-			return (rs.getString("username").equals(this.getUsername()) &&
-			 rs.getString("password").equals(this.getPassword()));
+			return (rs.getString("username").equals(this.getUsername())
+					&& rs.getString("password").equals(this.getPassword()));
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			return false;
