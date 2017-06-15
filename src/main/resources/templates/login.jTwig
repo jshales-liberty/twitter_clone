@@ -31,7 +31,7 @@ button.onclick = function () {
         Password: <input type="password" id="password" name="password"><br>
         <br>
         <button type="submit" id= "login_button">Log In</button>
-        <button type="submit" value="newUser"><a href = "/createNewUser">New User</a></button>
+        <button type="submit" value="newUser"><a href = "/createUser">New User</a></button>
       <div>
       <div id="output">
       here

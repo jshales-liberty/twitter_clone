@@ -31,22 +31,22 @@ public class Twitter {
 	            return c.checkCredentials();
 	        });
 		
-		get("/createNewUser", (request, response) -> {
+		get("/createUser", (request, response) -> {
 			return createNewUserHTML();
 		});
 		
-		post("/createNewUser", (request, response) -> {
-			new User(request.queryParams("firstName"),
-								request.queryParams("lastName"),
-								request.queryParams("username"),
-								request.queryParams("birth_date"),
-								request.queryParams("email"),
-								request.queryParams("bio"),
-								request.queryParams("password"));
-			
-			System.out.println(request.queryParams("lastName"));
-			return createLoginHTML();
-		});
+//		post("/createNewUser", (request, response) -> {
+//			new User(request.queryParams("firstName"),
+//								request.queryParams("lastName"),
+//								request.queryParams("username"),
+//								request.queryParams("birth_date"),
+//								request.queryParams("email"),
+//								request.queryParams("bio"),
+//								request.queryParams("password"));
+//			System.out.println("create new user is used");
+//			System.out.println(request.queryParams("lastName"));
+//			return createLoginHTML();
+//		});
 
 		get("/createTweetHTML", (request, response) -> {
 			//remove line below
@@ -66,6 +66,7 @@ public class Twitter {
 					request.session().attribute("username", request.queryParams("username"));
 					userId = request.session().attribute("username");
 					System.out.println(userId);
+					System.out.println("create user is used");
 			return createTweetPageHTML(userId);
 		});
 		
@@ -73,7 +74,7 @@ public class Twitter {
             String body = req.body();
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
-            
+             
             new Tweet(tweet.getTweet(), "1");
             
             return "jsonpost";
