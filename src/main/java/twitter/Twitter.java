@@ -105,14 +105,27 @@ public class Twitter {
 		});
 
 		post("/submitTweet", (req, res) -> {
-			String body = req.body();
-			Gson gson = new Gson();
-			Tweet tweet = gson.fromJson(body, Tweet.class);
+            String body = req.body();
+            Gson gson = new Gson();
+            Tweet tweet = gson.fromJson(body, Tweet.class);
+             
+            new Tweet(tweet.getTweet(), "1");
+            
+            return "jsonpost";
+        });
+		
+		 get("/logoff", (req, res) -> {
+			 req.session().attribute("username","Good-bye");
+			 return createlogOffPageHTML(req.session().attribute("username"));
+		 });
+			          
+	}
+	
+	private static String createlogOffPageHTML(String username) {
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logOff.jTwig");
+        JtwigModel model = JtwigModel.newModel().with("username", username);
 
-			new Tweet(tweet.getTweet(), "1");
-
-			return "jsonpost";
-		});
+		return template.render(model);
 	}
 
 	public static String createLoginHTML() {
