@@ -19,7 +19,7 @@ public class Tweet {
 		String stringTimeStamp = timestamp.toString();
 		
 		try (Connection conn = DriverManager.getConnection(url)){
-			String sql = "INSERT INTO tweet(user_id, tweet, time_stamp) VALUES(?,?,?)";
+			String sql = "INSERT INTO tweet(user_id, tweet, create_timestamp) VALUES(?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, this.createdBy);
 			pstmt.setString(2, this.tweet);

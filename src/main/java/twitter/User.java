@@ -97,6 +97,7 @@ public class User {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 
+
 		try (Connection conn = DriverManager.getConnection(url);
 				PreparedStatement pstmt_create = conn.prepareStatement(
 						"INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");
@@ -126,6 +127,7 @@ public class User {
 
 	public boolean checkCredentials() {
 		String url = "jdbc:sqlite:twitterclone.db";
+		
 		try (Connection conn = DriverManager.getConnection(url);
 				PreparedStatement pstmt = conn.prepareStatement(
 						"Select username, password from user_info where username = ? and password = ?;");) {
