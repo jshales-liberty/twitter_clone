@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 
 public class User {
@@ -98,19 +97,29 @@ public class User {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 
-		
-		try (Connection conn = DriverManager.getConnection(url)){
-			String sql = "INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)";
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, this.first_name);
-			pstmt.setString(2, this.last_name);
-			pstmt.setString(3, this.bio);
-			pstmt.setString(4, this.birth_date);
-			pstmt.setString(5, this.email_address);
-			pstmt.setString(6, this.username);
-			pstmt.setString(7, this.password);
-			pstmt.setString(8, stringTimeStamp);
-			pstmt.executeUpdate();
+
+		try (Connection conn = DriverManager.getConnection(url);
+				PreparedStatement pstmt_create = conn.prepareStatement(
+						"INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");
+				PreparedStatement pstmt_validate = conn.prepareStatement(
+						"Select username from user_info where username = ? OR email_address = ?");) {
+			pstmt_validate.setString(1, this.username);
+			pstmt_validate.setString(2, this.email_address);
+			int i = pstmt_validate.executeUpdate();
+			System.out.println(i);
+			if (i <= 0) {
+				pstmt_create.setString(1, this.first_name);
+				pstmt_create.setString(2, this.last_name);
+				pstmt_create.setString(3, this.bio);
+				pstmt_create.setString(4, this.birth_date);
+				pstmt_create.setString(5, this.email_address);
+				pstmt_create.setString(6, this.username);
+				pstmt_create.setString(7, this.password);
+				pstmt_create.setString(8, stringTimeStamp);
+				pstmt_create.executeUpdate();
+			} else {
+				System.out.println("User already exists");
+			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
