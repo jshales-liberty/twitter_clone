@@ -2,8 +2,6 @@
   <html>
     <head>
         <title>JNT Messaging Tweets</title>
-        
-        
         <style>
            header {
             background-color:#262626;
@@ -28,7 +26,7 @@
             text-align: center;
             padding: 1em;
             overflow: hidden;
-            background-color: #f0f0f5; 
+            background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
           }
 
@@ -48,16 +46,16 @@
 			margin-left: 1em;
 			margin-right: 1em;
 		}
-		
+
 		div {
 			margin-top: 1em;
-		}	
-		
+		}
+
 		#logoff {
 			position: absolute;
 			right: 10px;
 		}
-		
+
         </style>
       </head>
     <body>
@@ -81,14 +79,10 @@
           <aside id = "popular_tweeters">
             <h3>Popular Tweeters</h3>
           </aside>
-        <section class = "following_tweets" id = "following_tweets">
-
-          <p>Test</p>  
-
+      <section class = "following_tweets" id = "following_tweets">  
       </section>
-    </body> 
+    </body>
     <script>
-    	
         	/*Script to build popular tweeters aside */
        {	
         	let xhr = new XMLHttpRequest();
@@ -156,7 +150,7 @@
          		}
      		};
      		var tweet = {tweet: document.getElementById("tweetTextArea").value};
-     	
+
      		xhr.send(JSON.stringify(tweet));
  	    };
 	}
@@ -177,12 +171,12 @@
              			console.log('Request failed.  Returned status of ' + xhr.status);
          			}
      			};
+     			
      			let tweet = {follows: tweeter};
      	
      			xhr.send(JSON.stringify(tweet));
     		}
     	});
     }
-   		
    </script>
    </html>
