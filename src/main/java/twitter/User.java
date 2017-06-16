@@ -28,30 +28,30 @@ public class User {
 	}
 
 	public String getPassword() {
-		 password += "toaster";
-	        MessageDigest md;
-			try {
-				md = MessageDigest.getInstance("SHA");
-				md.update(password.getBytes());
-		        String digest = new String(md.digest());
-		        return digest;
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-				return "";
-			}
+		password += "toaster";
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA");
+			md.update(password.getBytes());
+			String digest = new String(md.digest());
+			return digest;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
 	public void setPassword(String password) {
-	        password += "toaster";
-	        MessageDigest md;
-			try {
-				md = MessageDigest.getInstance("SHA");
-				md.update(password.getBytes());
-		        String digest = new String(md.digest());
-		        this.password = digest;
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			}
+		password += "toaster";
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA");
+			md.update(password.getBytes());
+			String digest = new String(md.digest());
+			this.password = digest;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String getFirst_name() {

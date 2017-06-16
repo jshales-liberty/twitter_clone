@@ -12,8 +12,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import static spark.Spark.port;
 
 import org.jtwig.JtwigModel;
@@ -40,7 +38,7 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			int result = c.checkCredentials();
+			int result = c.checkCredentials(); //returns user id
 
 			if (result == -1) {
 				return false;
@@ -59,9 +57,9 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			User d = new User(c.getFirst_name(), c.getLast_name(), c.getUsername(),
-					c.getEmail(), c.getBirth_date(), c.getBio(),
-					c.getPassword());
+			User d = new User(c.getFirst_name(), c.getLast_name(),
+					c.getUsername(), c.getEmail(), c.getBirth_date(),
+					c.getBio(), c.getPassword());
 			if (d.getId() == -1) {
 				return false;
 			} else {
