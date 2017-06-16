@@ -40,7 +40,6 @@ button.onclick = function () {
         <button type="submit" value="newUser"><a href = "/createUser">New User</a></button>
       <div>
       <div id="output">
-      here
       <div>
 
     <body>

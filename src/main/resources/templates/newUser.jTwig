@@ -4,39 +4,67 @@
      <title>JNT Messaging New User</title>
      <script>
 
-		
+		window.onload = function(){
+var button = document.getElementById('submit');
+button.onclick = function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/createUser');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            if ((xhr.responseText=='true') == true) {
+            	window.location = "/createTweetHTML";
+            } else {
+            	document.getElementById('output').innerHTML="Username/Email already in use.";
+            	;
+            }
+        } else if (xhr.status !== 200) {
+            alert('Request failed.  Returned status of ' + xhr.status);
+        }
+    };
+    var register = {username: document.getElementById('username').value, 
+    password: document.getElementById('password').value,
+    first_name: document.getElementById('firstName').value, 
+    last_name: document.getElementById('lastName').value,
+    birth_date: document.getElementById('birth_date').value, 
+    email_address: document.getElementById('email').value,
+    bio: document.getElementById('bio').value, 
+    pic: document.getElementById('pic').value};
+    xhr.send(JSON.stringify(register));
+}};
 	</script>
     </head>
     <body>
       <h2>Create New User</h2>
       <div>
-      	<form action= "/createUser" method = "POST">
-	        User Name: <input type="text" name="username">
+	        User Name: <input type="text" id="username">
 	        <br>
 	        <br>
-	        Password: <input type="password" name="password"{6, }>
+	        Password: <input type="password" id="password"{6, }>
 	        <br>
 	        <br>
-	        First Name: <input type="text" name ="firstName">
+	        First Name: <input type="text" id ="firstName">
 	        <br>
 	        <br>
-	        Last Name: <input type="text" name ="lastName">
+	        Last Name: <input type="text" id ="lastName">
 	        <br>
 	        <br>
-	        Birth Date: <input type="date" name ="birth_date">
+	        Birth Date: <input type="date" id ="birth_date">
 	        <br>
 	        <br>
-	        Email: <input type="text" name ="email">
+	        Email: <input type="text" id ="email">
 	        <br>
 	        <br>
-	        Bio: <textarea rows="4" cols="50" name = "bio"></textarea>
+	        Bio: <textarea rows="4" cols="50" id = "bio"></textarea>
 	        <br>
 	        <br>
-	        <input type="file" name="pic" accept="image/*">
+	        <input type="file" id="pic" accept="image/*">
 	        <br>
 	        <br>
 	        <button type="submit" id="submit">Submit</button>
-	  	</form>
+	              <div>
+      <div id="output">
+      <div>
       </div>
     <body>
  </html>
