@@ -91,16 +91,14 @@ public class Twitter {
 			new User(request.queryParams("firstName"),
 					request.queryParams("lastName"),
 					request.queryParams("username"),
+					request.queryParams("email"),
 					request.queryParams("birth_date"),
-					request.queryParams("email"), 
 					request.queryParams("bio"),
 					request.queryParams("password"));
 					request.session().attribute("username",
 					request.queryParams("username"));
+					
 			String userId = request.session().attribute("username");
-
-			System.out.println(userId);
-			System.out.println("create user is used");
 
 			return createTweetPageHTML();
 		});
@@ -122,13 +120,13 @@ public class Twitter {
             JsonObject obj = parser.parse(body).getAsJsonObject();
             
 			String url = "jdbc:sqlite:twitterclone.db";
-			
+
 			String selectSql = "SELECT user_id FROM user_info WHERE username = ?";
 			String insertSql = "INSERT INTO follower(user_id, follows_user_id, create_timestamp) VALUES(?,?,?)";
-			
+
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			String stringTimeStamp = timestamp.toString();
-			
+
 			try (Connection conn = DriverManager.getConnection(url);
 				PreparedStatement pstmtSelect = conn.prepareStatement(selectSql);
 				PreparedStatement pstmtInsert = conn.prepareStatement(insertSql);){
@@ -145,17 +143,18 @@ public class Twitter {
 				System.out.println(e.getMessage());
 			}
 			return req;
-        });
-		
-		 get("/logoff", (req, res) -> {
-			 return createlogOffPageHTML(req.session().attribute("username"));
-		 });
-			          
+		});
+
+		get("/logoff", (req, res) -> {
+			return createlogOffPageHTML(req.session().attribute("username"));
+		});
+
 	}
-	
+
 	private static String createlogOffPageHTML(String username) {
-		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logOff.jTwig");
-        JtwigModel model = JtwigModel.newModel().with("username", username);
+		JtwigTemplate template = JtwigTemplate
+				.classpathTemplate("templates/logOff.jTwig");
+		JtwigModel model = JtwigModel.newModel().with("username", username);
 
 		return template.render(model);
 	}
