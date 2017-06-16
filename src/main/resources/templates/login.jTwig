@@ -13,7 +13,6 @@ button.onclick = function () {
     xhr.onload = function() {
         if (xhr.status === 200) {
             if ((xhr.responseText=='true') == true) {
-            console.log("trying");
             	window.location = "/createTweetHTML";
             } else {
             	document.getElementById('output').innerHTML="Login Incorrect";
