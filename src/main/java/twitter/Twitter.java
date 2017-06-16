@@ -26,8 +26,6 @@ import com.google.gson.JsonParser;
 
 public class Twitter {
 
-	private static String userId;
-
 	public static void main(String[] args) {
 
 		port(2613);
@@ -41,6 +39,7 @@ public class Twitter {
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
 			int result = c.checkCredentials();
+			
 			if (result == -1) {
 				return false;
 			} else {
@@ -70,7 +69,7 @@ public class Twitter {
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			;
-			return gson.toJson(getPopularTweeters());
+			return gson.toJson(getPopularTweeters(request.session().attribute("user_id")));
 		});
 
 		post("/createNewUser", (request, response) -> {
@@ -84,9 +83,7 @@ public class Twitter {
 		});
 
 		get("/createTweetHTML", (request, response) -> {
-			// remove line below
-			userId = "LB33";
-			return createTweetPageHTML(userId);
+			return createTweetPageHTML();
 
 		});
 
@@ -98,37 +95,31 @@ public class Twitter {
 					request.queryParams("email"), 
 					request.queryParams("bio"),
 					request.queryParams("password"));
-			request.session().attribute("username",
+					request.session().attribute("username",
 					request.queryParams("username"));
-			userId = request.session().attribute("username");
+			String userId = request.session().attribute("username");
 
 			System.out.println(userId);
 			System.out.println("create user is used");
 
-			return createTweetPageHTML(userId);
+			return createTweetPageHTML();
 		});
 
 		post("/submitTweet", (req, res) -> {
             String body = req.body();
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
-             
-            new Tweet(tweet.getTweet(), "1");
+            System.out.println(req.session().attribute("user_id").toString());
+            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")));
             
             return "jsonpost";
         });	
 		
 		post("/submitFollow", (req, res) -> {
 			String body = req.body();
-            Gson gson = new Gson();
-            System.out.println(body);
            
             JsonParser parser = new JsonParser();
             JsonObject obj = parser.parse(body).getAsJsonObject();
-            String user = obj.get("user").getAsString();
-            String follows = obj.get("follows").getAsString();
-            
-            System.out.println(user + " " + follows);
             
 			String url = "jdbc:sqlite:twitterclone.db";
 			
@@ -144,11 +135,9 @@ public class Twitter {
 				
 					pstmtSelect.setString(1, obj.get("follows").getAsString());
 					ResultSet rs = pstmtSelect.executeQuery();
-					int followsId = rs.getInt("user_id");
-					System.out.println(followsId);
-					
-					pstmtInsert.setInt(1, obj.get("user").getAsInt());
-					pstmtInsert.setInt(2, followsId);
+										
+					pstmtInsert.setInt(1, req.session().attribute("user_id"));
+					pstmtInsert.setInt(2, rs.getInt("user_id"));
 					pstmtInsert.setString(3, stringTimeStamp);
 					pstmtInsert.executeUpdate();
 					
@@ -187,7 +176,7 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static String createTweetPageHTML(String userId) {
+	public static String createTweetPageHTML() {
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel();
@@ -195,14 +184,19 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static ArrayList<String> getPopularTweeters() {
+	public static ArrayList<String> getPopularTweeters(int userId) {
 		String url = "jdbc:sqlite:twitterclone.db";
 		ArrayList<String> popularTweeters = new ArrayList<String>();
-
+		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
+		
 		try (Connection conn = DriverManager.getConnection(url);
 				Statement stmt = conn.createStatement();) {
-			String sql = "SELECT username FROM user_info LIMIT 3;";
+			//String sql = "SELECT username FROM user_info LIMIT 3;";
+			
 			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, userId);
+			
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				popularTweeters.add(rs.getString("username"));

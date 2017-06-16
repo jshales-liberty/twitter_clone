@@ -8,11 +8,11 @@ import java.sql.Timestamp;
 
 public class Tweet {
 	private String tweet;
-	private String createdBy;
+	private int createdById;
 	
-	public Tweet(String tweet, String createdBy) {
+	public Tweet(String tweet, int createdById) {
 		this.tweet = tweet;
-		this.createdBy = createdBy;
+		this.createdById = createdById;
 		
 		String url = "jdbc:sqlite:twitterclone.db";
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -21,7 +21,7 @@ public class Tweet {
 		try (Connection conn = DriverManager.getConnection(url)){
 			String sql = "INSERT INTO tweet(user_id, tweet, create_timestamp) VALUES(?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, this.createdBy);
+			pstmt.setInt(1, this.createdById);
 			pstmt.setString(2, this.tweet);
 			pstmt.setString(3, stringTimeStamp);
 			pstmt.executeUpdate();
@@ -38,11 +38,11 @@ public class Tweet {
 		this.tweet = tweet;
 	}
 
-	public String getCreatedBy() {
-		return createdBy;
+	public int getCreatedBy() {
+		return createdById;
 	}
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
+	public void setCreatedById(String createdBy) {
+		this.createdById = createdById;
 	}
 }

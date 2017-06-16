@@ -133,7 +133,6 @@ public class User {
 						"Select username, password, user_id from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, this.username);
 			pstmt.setString(2, this.password);
-			System.out.println("here");
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.isBeforeFirst())
 			{String result = rs.getString("user_id");
