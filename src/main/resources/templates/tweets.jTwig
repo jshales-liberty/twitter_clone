@@ -2,29 +2,29 @@
   <html>
     <head>
         <title>JNT Messaging Tweets</title>
-        
+
         <script>
         	var xhr = new XMLHttpRequest();
             xhr.open('GET', '/popularTweeters');
             	xhr.onload = function(evt) {
             	if (xhr.status === 200) {
               		var response = JSON.parse(xhr.responseText);
-              		for(var i = 0; i < response.length; i++){              		
+              		for(var i = 0; i < response.length; i++){
               			var popularDiv = "popularDiv" + i;
               			var div = document.createElement('div');
               			div.setAttribute('id', popularDiv);
-              		
-              			var popularBtn = "popularBtn" + i;		
+
+              			var popularBtn = "popularBtn" + i;
               			var btn = document.createElement('BUTTON');
               			var btnText = document.createTextNode('Follow');
               			btn.appendChild(btnText);
               			btn.setAttribute('tweeter', response[i]);
-               			
+
                			document.getElementById('popular_tweeters').appendChild(div);
                			document.getElementById(popularDiv).appendChild(btn);
                			var tweeter = document.createTextNode(response[i]);
                			document.getElementById(popularDiv).appendChild(tweeter);
-               			
+
                		};
                 } else {
                     alert('Request failed.  Returned status of ' + xhr.status);
@@ -32,7 +32,7 @@
             };
             xhr.send();
         </script>
-        
+
         <style>
            header {
             background-color:#262626;
@@ -57,7 +57,7 @@
             text-align: center;
             padding: 1em;
             overflow: hidden;
-            background-color: #f0f0f5; 
+            background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
           }
 
@@ -77,16 +77,16 @@
 			margin-left: 1em;
 			margin-right: 1em;
 		}
-		
+
 		div {
 			margin-top: 1em;
-		}	
-		
+		}
+
 		#logoff {
 			position: absolute;
 			right: 10px;
 		}
-		
+
         </style>
       </head>
     <body>
@@ -112,7 +112,7 @@
           </aside>
         <section class = "following_tweets">
 
-          <p>Test</p>  
+          <p>Test</p>
           <br>
           <br>
           <br>
@@ -137,7 +137,7 @@
           <br>
           <br>
       </section>
-    </body> 
+    </body>
     <script>
  	  	var tweet_button = document.getElementById('tweet');
  		tweet_button.onclick = function () {
@@ -152,11 +152,11 @@
          		}
      		};
      		var tweet = {tweet: document.getElementById("tweetTextArea").value};
-     	
+
      		xhr.send(JSON.stringify(tweet));
  	    };
-   </script> 
-   
+   </script>
+
    <script>
    		var tableClick = document.getElementById('popular_tweeters');
 
@@ -175,10 +175,10 @@
          			}
      			};
      			var tweet = {follows: tweeter};
-     	
+
      			xhr.send(JSON.stringify(tweet));
     		}
     	});
-   		
+
    </script>
    </html>
