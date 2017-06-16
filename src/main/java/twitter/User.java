@@ -99,25 +99,25 @@ public class User {
 
 		try (Connection conn = DriverManager.getConnection(url);
 				PreparedStatement pstmt_validate = conn.prepareStatement(
-						"Select username from user_info where username = ? OR email_address = ?");) {
-			pstmt_validate.setString(1, this.username);
-			pstmt_validate.setString(2, this.email_address);
-			int i = pstmt_validate.executeUpdate();
-			pstmt_validate.close();
-			PreparedStatement pstmt_create = conn.prepareStatement(
-					"INSERT INTO user_info(first_name, last_name, bio, birth_date, email_address, username, password, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");
-
-			if (i <= 0) {
-				pstmt_create.setString(1, this.first_name);
-				pstmt_create.setString(2, this.last_name);
-				pstmt_create.setString(3, this.bio);
-				pstmt_create.setString(4, this.birth_date);
-				pstmt_create.setString(5, this.email_address);
-				pstmt_create.setString(6, this.username);
-				pstmt_create.setString(7, this.password);
+						"Select count(*) as count from (Select username from user_info where username = ? OR email_address = ?)");
+				PreparedStatement pstmt_create = conn.prepareStatement(
+						"INSERT INTO user_info(username, password, first_name, last_name, birth_date, email_address, bio, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");) {
+			pstmt_validate.setString(1, this.getUsername());
+			pstmt_validate.setString(2, this.getEmail());
+			ResultSet rs = pstmt_validate.executeQuery();
+			int i = rs.getInt("count");
+			if (i<1) {
+				pstmt_create.setString(3, this.getFirst_name());
+				pstmt_create.setString(4, this.getLast_name());
+				pstmt_create.setString(7, this.getBio());
+				pstmt_create.setString(5, this.getBirth_date());
+				pstmt_create.setString(6, this.getEmail());
+				pstmt_create.setString(1, this.getUsername());
+				pstmt_create.setString(2, this.getPassword());
 				pstmt_create.setString(8, stringTimeStamp);
 				pstmt_create.executeUpdate();
-			} else {
+			} 
+			else {
 				System.out.println("User already exists");
 			}
 		} catch (SQLException e) {
@@ -133,7 +133,6 @@ public class User {
 						"Select username, password, user_id from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, this.username);
 			pstmt.setString(2, this.password);
-			System.out.println("here");
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.isBeforeFirst())
 			{String result = rs.getString("user_id");
