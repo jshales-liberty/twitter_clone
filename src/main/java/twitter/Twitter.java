@@ -26,6 +26,8 @@ import com.google.gson.JsonParser;
 
 public class Twitter {
 
+	final static String DB_URL = "jdbc:sqlite:twitterclone.db";
+
 	public static void main(String[] args) {
 
 		port(2613);
@@ -39,7 +41,7 @@ public class Twitter {
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
 			int result = c.checkCredentials();
-			
+
 			if (result == -1) {
 				return false;
 			} else {
@@ -53,33 +55,26 @@ public class Twitter {
 			return createNewUserHTML();
 		});
 
-		// post("/createNewUser", (request, response) -> {
-		// new User(request.queryParams("firstName"),
-		// request.queryParams("lastName"),
-		// request.queryParams("username"),
-		// request.queryParams("birth_date"),
-		// request.queryParams("email"),
-		// request.queryParams("bio"),
-		// request.queryParams("password"));
-		// System.out.println("create new user is used");
-		// System.out.println(request.queryParams("lastName"));
-		// return createLoginHTML();
-		// });
+		post("/createUser", (request, response) -> {
+			String body = request.body();
+			Gson gson = new Gson();
+			User c = gson.fromJson(body, User.class);
+			User d = new User(c.getFirst_name(), c.getLast_name(), c.getUsername(),
+					c.getEmail(), c.getBirth_date(), c.getBio(),
+					c.getPassword());
+			if (d.getId() == -1) {
+				return false;
+			} else {
+				request.session().attribute("username", d.getUsername());
+				request.session().attribute("user_id", d.checkCredentials());
+				return true;
+			}
+		});
 
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			;
-			return gson.toJson(getPopularTweeters(request.session().attribute("user_id")));
-		});
-
-		post("/createNewUser", (request, response) -> {
-			new User(request.queryParams("firstName"),
-					request.queryParams("lastName"),
-					request.queryParams("username"),
-					request.queryParams("birth_date"),
-					request.queryParams("email"), request.queryParams("bio"),
-					request.queryParams("password"));
-			return createLoginHTML();
+			return gson.toJson(
+					getPopularTweeters(request.session().attribute("user_id")));
 		});
 
 		get("/createTweetHTML", (request, response) -> {
@@ -87,39 +82,21 @@ public class Twitter {
 
 		});
 
-		post("/createUser", (request, response) -> {
-			new User(request.queryParams("firstName"),
-					request.queryParams("lastName"),
-					request.queryParams("username"),
-					request.queryParams("email"),
-					request.queryParams("birth_date"),
-					request.queryParams("bio"),
-					request.queryParams("password"));
-					request.session().attribute("username",
-					request.queryParams("username"));
-					
-			String userId = request.session().attribute("username");
+		post("/submitTweet", (req, res) -> {
+			String body = req.body();
+			Gson gson = new Gson();
+			Tweet tweet = gson.fromJson(body, Tweet.class);
+			System.out.println(req.session().attribute("user_id").toString());
+			new Tweet(tweet.getTweet(), (req.session().attribute("user_id")));
 
-			return createTweetPageHTML();
+			return "jsonpost";
 		});
 
-		post("/submitTweet", (req, res) -> {
-            String body = req.body();
-            Gson gson = new Gson();
-            Tweet tweet = gson.fromJson(body, Tweet.class);
-            System.out.println(req.session().attribute("user_id").toString());
-            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")));
-            
-            return "jsonpost";
-        });	
-		
 		post("/submitFollow", (req, res) -> {
 			String body = req.body();
-           
-            JsonParser parser = new JsonParser();
-            JsonObject obj = parser.parse(body).getAsJsonObject();
-            
-			String url = "jdbc:sqlite:twitterclone.db";
+
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(body).getAsJsonObject();
 
 			String selectSql = "SELECT user_id FROM user_info WHERE username = ?";
 			String insertSql = "INSERT INTO follower(user_id, follows_user_id, create_timestamp) VALUES(?,?,?)";
@@ -127,18 +104,20 @@ public class Twitter {
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 			String stringTimeStamp = timestamp.toString();
 
-			try (Connection conn = DriverManager.getConnection(url);
-				PreparedStatement pstmtSelect = conn.prepareStatement(selectSql);
-				PreparedStatement pstmtInsert = conn.prepareStatement(insertSql);){
-				
-					pstmtSelect.setString(1, obj.get("follows").getAsString());
-					ResultSet rs = pstmtSelect.executeQuery();
-										
-					pstmtInsert.setInt(1, req.session().attribute("user_id"));
-					pstmtInsert.setInt(2, rs.getInt("user_id"));
-					pstmtInsert.setString(3, stringTimeStamp);
-					pstmtInsert.executeUpdate();
-					
+			try (Connection conn = DriverManager.getConnection(DB_URL);
+					PreparedStatement pstmtSelect = conn
+							.prepareStatement(selectSql);
+					PreparedStatement pstmtInsert = conn
+							.prepareStatement(insertSql);) {
+
+				pstmtSelect.setString(1, obj.get("follows").getAsString());
+				ResultSet rs = pstmtSelect.executeQuery();
+
+				pstmtInsert.setInt(1, req.session().attribute("user_id"));
+				pstmtInsert.setInt(2, rs.getInt("user_id"));
+				pstmtInsert.setString(3, stringTimeStamp);
+				pstmtInsert.executeUpdate();
+
 			} catch (SQLException e) {
 				System.out.println(e.getMessage());
 			}
@@ -187,15 +166,15 @@ public class Twitter {
 		String url = "jdbc:sqlite:twitterclone.db";
 		ArrayList<String> popularTweeters = new ArrayList<String>();
 		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
-		
+
 		try (Connection conn = DriverManager.getConnection(url);
 				Statement stmt = conn.createStatement();) {
-			//String sql = "SELECT username FROM user_info LIMIT 3;";
-			
+			// String sql = "SELECT username FROM user_info LIMIT 3;";
+
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, userId);
-			
+
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				popularTweeters.add(rs.getString("username"));

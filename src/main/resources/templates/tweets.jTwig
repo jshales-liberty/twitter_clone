@@ -5,28 +5,28 @@
         
         <script>
         	var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/popularTweeters');
             	xhr.onload = function(evt) {
             	if (xhr.status === 200) {
-              		var response = JSON.parse(xhr.responseText);
-              		for(var i = 0; i < response.length; i++){              		
-              			var popularDiv = "popularDiv" + i;
-              			var div = document.createElement('div');
-              			div.setAttribute('id', popularDiv);
+                xhr.open('GET', '/popularTweeters');
+              	var response = JSON.parse(xhr.responseText);
+              	for(var i = 0; i < response.length; i++){              		
+              		var popularDiv = "popularDiv" + i;
+              		var div = document.createElement('div');
+              		div.setAttribute('id', popularDiv);
               		
-              			var popularBtn = "popularBtn" + i;		
-              			var btn = document.createElement('BUTTON');
-              			var btnText = document.createTextNode('Follow');
-              			btn.appendChild(btnText);
-              			btn.setAttribute('tweeter', response[i]);
+              		var popularBtn = "popularBtn" + i;		
+              		var btn = document.createElement('BUTTON');
+              		var btnText = document.createTextNode('Follow');
+              		btn.appendChild(btnText);
+              		btn.setAttribute('tweeter', response[i]);
                			
-               			document.getElementById('popular_tweeters').appendChild(div);
-               			document.getElementById(popularDiv).appendChild(btn);
-               			var tweeter = document.createTextNode(response[i]);
-               			document.getElementById(popularDiv).appendChild(tweeter);
-               			
-               		};
-                } else {
+               		document.getElementById('popular_tweeters').appendChild(div);
+               		document.getElementById(popularDiv).appendChild(btn);
+               		var tweeter = document.createTextNode(response[i]);
+            			document.getElementById(popularDiv).appendChild(tweeter);
+               		}} 
+              else if (xhr.status ===500) {window.location = "/login"} 
+              else {
                     alert('Request failed.  Returned status of ' + xhr.status);
                 }
             };

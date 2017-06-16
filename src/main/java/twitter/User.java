@@ -93,11 +93,10 @@ public class User {
 		this.bio = bio;
 		this.password = password;
 
-		String url = "jdbc:sqlite:twitterclone.db";
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 
-		try (Connection conn = DriverManager.getConnection(url);
+		try (Connection conn = DriverManager.getConnection(Twitter.DB_URL);
 				PreparedStatement pstmt_validate = conn.prepareStatement(
 						"Select count(*) as count from (Select username from user_info where username = ? OR email_address = ?)");
 				PreparedStatement pstmt_create = conn.prepareStatement(
@@ -106,7 +105,7 @@ public class User {
 			pstmt_validate.setString(2, this.getEmail());
 			ResultSet rs = pstmt_validate.executeQuery();
 			int i = rs.getInt("count");
-			if (i<1) {
+			if (i < 1) {
 				pstmt_create.setString(3, this.getFirst_name());
 				pstmt_create.setString(4, this.getLast_name());
 				pstmt_create.setString(7, this.getBio());
@@ -116,8 +115,9 @@ public class User {
 				pstmt_create.setString(2, this.getPassword());
 				pstmt_create.setString(8, stringTimeStamp);
 				pstmt_create.executeUpdate();
-			} 
-			else {
+				this.setId(this.checkCredentials());
+			} else {
+				this.setId(-1);
 				System.out.println("User already exists");
 			}
 		} catch (SQLException e) {
@@ -126,19 +126,18 @@ public class User {
 	}
 
 	public int checkCredentials() {
-		String url = "jdbc:sqlite:twitterclone.db";
 
-		try (Connection conn = DriverManager.getConnection(url);
+		try (Connection conn = DriverManager.getConnection(Twitter.DB_URL);
 				PreparedStatement pstmt = conn.prepareStatement(
 						"Select username, password, user_id from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, this.username);
 			pstmt.setString(2, this.password);
 			ResultSet rs = pstmt.executeQuery();
-			if (rs.isBeforeFirst())
-			{String result = rs.getString("user_id");
+			if (rs.isBeforeFirst()) {
+				String result = rs.getString("user_id");
 				return Integer.parseInt(result);
 			} else {
-				return -1; //no user_id
+				return -1; // no user_id
 			}
 
 		} catch (SQLException e) {
