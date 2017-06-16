@@ -25,7 +25,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Twitter {
-
+	public static final String DB_URL = "jdbc:sqlite:twitterclone.db"; 
+		
 	public static void main(String[] args) {
 
 		port(2613);
@@ -53,23 +54,15 @@ public class Twitter {
 			return createNewUserHTML();
 		});
 
-		// post("/createNewUser", (request, response) -> {
-		// new User(request.queryParams("firstName"),
-		// request.queryParams("lastName"),
-		// request.queryParams("username"),
-		// request.queryParams("birth_date"),
-		// request.queryParams("email"),
-		// request.queryParams("bio"),
-		// request.queryParams("password"));
-		// System.out.println("create new user is used");
-		// System.out.println(request.queryParams("lastName"));
-		// return createLoginHTML();
-		// });
-
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			;
-			return gson.toJson(getPopularTweeters(request.session().attribute("user_id")));
+			String s =  gson.toJson(getPopularTweeters(request.session().attribute("user_id")));
+			return s;
+		});
+		
+		get("/tweetList", (request, response) -> {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return gson.toJson(getTweetList(request.session().attribute("user_id")));
 		});
 
 		post("/createNewUser", (request, response) -> {
@@ -108,7 +101,7 @@ public class Twitter {
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
             System.out.println(req.session().attribute("user_id").toString());
-            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")));
+            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")), req.session().attribute("username"));
             
             return "jsonpost";
         });	
@@ -189,10 +182,9 @@ public class Twitter {
 		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
 		
 		try (Connection conn = DriverManager.getConnection(url);
-				Statement stmt = conn.createStatement();) {
-			//String sql = "SELECT username FROM user_info LIMIT 3;";
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			
-			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, userId);
 			
@@ -204,6 +196,52 @@ public class Twitter {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			return popularTweeters;
+		}
+	}
+	
+	public static ArrayList<Tweet> getTweetList(int userId) {
+		
+		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
+		
+		String sql = "SELECT t.TWEET 'Follows_Tweet', "
+				  		+ "t.user_id 'Follows_User_Id', "
+				  		+ "ui.username 'Follows_User_Name', "
+				  		+ "t.create_timestamp 'Tweet_Timestamp' "
+				  	+ "FROM TWEET t "
+				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "where t.user_id in (select distinct FOLLOWS_USER_ID from FOLLOWER "
+				  	+ "where USER_ID = ?) " 
+				  	+ "union "
+				  	+ "select t.TWEET  'Follows_Tweet', "
+				  		+ "t.user_id 'Follows_User_Id', "
+				  		+ "ui.username 'Follows_User_Name', "
+				  		+ "t.create_timestamp 'Tweet_TimeStamp' " 
+				  	+ "FROM tweet t "
+				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "where t.user_id = ? "
+				  	+ "ORDER BY t.create_timestamp DESC "
+				  	+ "LIMIT 100 ";
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, userId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				Tweet tweet = new Tweet(rs.getString("Follows_Tweet"), 
+						rs.getInt("Follows_User_Id"), 
+						rs.getString("Follows_User_Name"), 
+						rs.getString("Tweet_Timestamp"));
+				System.out.println(tweet.getTweet());
+				tweetsList.add(tweet);
+			}
+			return tweetsList;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return tweetsList;
 		}
 	}
 }
