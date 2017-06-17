@@ -70,7 +70,11 @@ public class Twitter {
 		});
 
 		get("/createTweetHTML", (request, response) -> {
-			return createTweetPageHTML();
+			if(request.session().attribute("user_id") == null){
+				return createLoginHTML();
+			}else {
+				return createTweetPageHTML();
+			}
 
 		});
 
@@ -150,6 +154,8 @@ public class Twitter {
 	}
 
 	public static String createTweetPageHTML() {
+		
+		
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel();
