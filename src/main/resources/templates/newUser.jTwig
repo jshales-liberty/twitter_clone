@@ -1,70 +1,128 @@
 <!DOCTYPE html>
 <html>
-  <head> 
-     <title>JNT Messaging New User</title>
-     <script>
-
-		window.onload = function(){
-var button = document.getElementById('submit');
-button.onclick = function () {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/createUser');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            if ((xhr.responseText=='true') == true) {
-            	window.location = "/createTweetHTML";
-            } else {
-            	document.getElementById('output').innerHTML="Username/Email already in use.";
-            	;
-            }
-        } else if (xhr.status !== 200) {
-            alert('Request failed.  Returned status of ' + xhr.status);
+    <head> 
+      <title>JNT Messaging New User</title>
+      <style>
+        body {
+        	padding: 1em;
+            overflow: hidden;
+            background-color: #f0f0f5;
+            box-shadow: 0px 1px 50px #5E5E5E;
         }
-    };
-    var register = {username: document.getElementById('username').value, 
-    password: document.getElementById('password').value,
-    first_name: document.getElementById('firstName').value, 
-    last_name: document.getElementById('lastName').value,
-    birth_date: document.getElementById('birth_date').value, 
-    email_address: document.getElementById('email').value,
-    bio: document.getElementById('bio').value, 
-    pic: document.getElementById('pic').value};
-    xhr.send(JSON.stringify(register));
-}};
-	</script>
-    </head>
+        
+        div {
+        	margin-bottom: 1em;
+        }
+        
+        input {
+        	margin-right: 1em;
+        	margin-left: 1em;
+        }
+        
+        textarea {
+        	margin-right: 1em;
+        	margin-left: 1em;
+        }
+        
+        #output {
+        	color: red;
+        	margin: 1em;
+        }
+        
+        button {
+    		background-color: white;
+    		color: black;
+    		border: 2px solid #555555;
+    		border-radius: 8px;
+    		margin-left: 1em;
+    		padding: 10px 16px;
+		}
+
+		button:hover {
+    		background-color: #555555;
+    		color: white;
+        }
+        
+      </style>
+  </head>
     <body>
       <h2>Create New User</h2>
-      <div>
-	        User Name: <input type="text" id="username">
-	        <br>
-	        <br>
-	        Password: <input type="password" id="password"{6, }>
-	        <br>
-	        <br>
-	        First Name: <input type="text" id ="firstName">
-	        <br>
-	        <br>
-	        Last Name: <input type="text" id ="lastName">
-	        <br>
-	        <br>
-	        Birth Date: <input type="date" id ="birth_date">
-	        <br>
-	        <br>
-	        Email: <input type="text" id ="email">
-	        <br>
-	        <br>
-	        Bio: <textarea rows="4" cols="50" id = "bio"></textarea>
-	        <br>
-	        <br>
-	        <input type="file" id="pic" accept="image/*">
-	        <br>
-	        <br>
-	        <button type="submit" id="submit">Submit</button>
-	              <div>
-      <div id="output">
-      <div>
+        <div>
+          <input type="text" id="username">User Name
       </div>
+      <div>
+          <input type="password" id="password">Password
+      </div>
+      <div>
+          <input type="password" id="reenterpsw">Reenter Password 
+      </div>
+      <div>
+          <input type="text" id ="firstName">First Name
+      </div>
+      <div>
+          <input type="text" id ="lastName">Last Name
+      </div>
+      <div>
+          <input type="date" id ="birth_date">Birth Date
+      </div>
+      <div>
+          <input type="text" id ="email">Email
+      </div>
+      <div>
+          <textarea rows="4" cols="50" id = "bio"></textarea>Bio
+      </div>
+      <div>    
+          <button type="submit" id="submit">Submit</button>
+      <div>
+        
+      <div id="output">
+      </div>
+    
+    <script>
+    var button = document.getElementById('submit');
+    button.onclick = function () {
+      
+      var psw = document.getElementById('password').value;
+      var repsw = document.getElementById('reenterpsw').value;
+      var passwordMatch = validatePswMatch(psw, repsw);
+
+      if(passwordMatch){
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/createUser');
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = function() {
+              if (xhr.status === 200) {
+                  if ((xhr.responseText=='true') == true) {
+                    window.location = "/createTweetHTML";
+                  } else {
+                  document.getElementById('output').innerHTML="Username/Email already in use.";
+                }
+            } else if (xhr.status !== 200) {
+                alert('Request failed.  Returned status of ' + xhr.status);
+            }
+          }
+
+          var register = {username: document.getElementById('username').value, 
+          password: document.getElementById('password').value,
+          first_name: document.getElementById('firstName').value, 
+          last_name: document.getElementById('lastName').value,
+          birth_date: document.getElementById('birth_date').value, 
+          email_address: document.getElementById('email').value,
+          bio: document.getElementById('bio').value}; 
+          
+          xhr.send(JSON.stringify(register));
+      }
+    }
+    
+    function validatePswMatch(psw, reenterpsw) {
+      if(psw !== reenterpsw){
+        document.getElementById('output').innerHTML="Passwords do not match. Please reenter.";
+        
+        return false;
+      } else {
+        return true;
+      }
+    }
+  </script>
     <body>
  </html>
