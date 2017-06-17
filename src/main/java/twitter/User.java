@@ -141,7 +141,7 @@ public class User {
 				this.setId(-1);
 				System.out.println("User already exists");
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}

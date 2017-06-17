@@ -54,19 +54,21 @@ public class Twitter {
 		});
 
 		post("/createUser", (request, response) -> {
-			String body = request.body();
+			try{String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
 			User d = new User(c.getFirst_name(), c.getLast_name(),
 					c.getUsername(), c.getEmail(), c.getBirth_date(),
 					c.getBio(), c.getPassword());
+			d.setId(d.checkCredentials());
 			if (d.getId() == -1) {
 				return false;
 			} else {
 				request.session().attribute("username", d.getUsername());
 				request.session().attribute("user_id", d.checkCredentials());
 				return true;
-			}
+			}} catch (Exception e) {System.out.println(e.getMessage());
+			return false;} 
 		});
 
 		get("/createTweetHTML", (request, response) -> {
