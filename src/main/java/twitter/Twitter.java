@@ -134,9 +134,11 @@ public class Twitter {
 		});
 
 		get("/logoff", (req, res) -> {
-			return createlogOffPageHTML(req.session().attribute("username"));
+			String userName = req.session().attribute("username");
+			req.session().attribute("username", "");
+			req.session().attribute("user_id", "");
+			return createlogOffPageHTML(userName);
 		});
-
 	}
 
 	public static String createLoginHTML() {
@@ -166,11 +168,10 @@ public class Twitter {
 	}
 
 	public static ArrayList<String> getPopularTweeters(int userId) {
-		String url = "jdbc:sqlite:twitterclone.db";
 		ArrayList<String> popularTweeters = new ArrayList<String>();
 		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
 
-		try (Connection conn = DriverManager.getConnection(url);
+		try (Connection conn = DriverManager.getConnection(DB_URL);
 				Statement stmt = conn.createStatement();
 				PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			

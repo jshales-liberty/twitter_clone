@@ -42,11 +42,6 @@
             width: 175px;
           }
 
-		button {
-			margin-left: 1em;
-			margin-right: 1em;
-		}
-
 		div {
 			margin-top: 1em;
 		}
@@ -55,6 +50,36 @@
 			position: absolute;
 			right: 10px;
 		}
+		
+		button {
+    		background-color: #d1d1e0;
+    		color: black;
+    		border: 2px solid #555555;
+    		border-radius: 8px;
+    		margin-left: 1em;
+    		margin-right: 1em;
+    		padding: 5px 10px;
+		}
+
+		button:hover {
+    		background-color: #555555;
+    		color: white;
+        }
+
+	      a:link {
+	      	color: black;
+ 	   		text-decoration: none;
+		}
+
+		a:visited {
+			color: black;
+    		text-decoration: none;
+		}
+		
+		a:hover {
+			color: white;
+		}
+		
 
         </style>
       </head>
@@ -64,7 +89,7 @@
           <form method = "POST">
             <input type="text" name ="search" class = "search">
             <button type="submit" id="search">Search</button>
-            <button id="logoff">Logoff</button>
+            <button id="logoff"><a href = "/logoff">Logoff</a></button>
           </form>
       </header>
           <br>
