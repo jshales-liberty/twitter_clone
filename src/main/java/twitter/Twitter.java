@@ -38,14 +38,12 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			int result = c.checkCredentials(); //returns user id
-
-			if (result == -1) {
-				return false;
-			} else {
-				request.session().attribute("username", c.getUsername());
-				request.session().attribute("user_id", result);
+			c=TwitterDB.checkCredentials(c);
+			if (c!=null) {
+				request.session().attribute("user", c);
 				return true;
+			} else {
+				return false;
 			}
 		});
 
@@ -54,25 +52,19 @@ public class Twitter {
 		});
 
 		post("/createUser", (request, response) -> {
-			try{String body = request.body();
+			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			User d = new User(c.getFirst_name(), c.getLast_name(),
-					c.getUsername(), c.getEmail(), c.getBirth_date(),
-					c.getBio(), c.getPassword());
-			d.setId(d.checkCredentials());
-			if (d.getId() == -1) {
+			if (!TwitterDB.checkExistence(c))
+				{c=TwitterDB.addUser(c);
+				request.session().attribute("user", c);
+				return true;}
+			 else {
 				return false;
-			} else {
-				request.session().attribute("username", d.getUsername());
-				request.session().attribute("user_id", d.checkCredentials());
-				return true;
-			}} catch (Exception e) {System.out.println(e.getMessage());
-			return false;} 
-		});
+			} });
 
 		get("/createTweetHTML", (request, response) -> {
-			if(request.session().attribute("user_id") == null){
+			if(((User) request.session().attribute("user")) == null){
 				return createLoginHTML();
 			}else {
 				return createTweetPageHTML();
@@ -82,21 +74,21 @@ public class Twitter {
 
 		get("/tweetList", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(getTweetList(request.session().attribute("user_id")));
+			return gson.toJson(getTweetList(((User) request.session().attribute("user")).getId()));
 		});
 
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			return gson.toJson(
-					getPopularTweeters(request.session().attribute("user_id")));
+					getPopularTweeters(((User) request.session().attribute("user")).getId()));
 		});
 
 		post("/submitTweet", (req, res) -> {
             String body = req.body();
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
-            System.out.println(req.session().attribute("user_id").toString());
-            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")), req.session().attribute("username"));
+            //System.out.println(req.session().attribute("user_id").toString());
+            new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()), ((User) req.session().attribute("user")).getUsername());
             
             return "jsonpost";
         });	
@@ -134,7 +126,7 @@ public class Twitter {
 		});
 
 		get("/logoff", (req, res) -> {
-			return createlogOffPageHTML(req.session().attribute("username"));
+			return createlogOffPageHTML(((User) req.session().attribute("user")).getUsername());
 		});
 
 	}
