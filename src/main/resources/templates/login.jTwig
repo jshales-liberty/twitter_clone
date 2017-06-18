@@ -12,19 +12,36 @@
         }
         
         button {
-    		background-color: white;
+    		background-color: #d1d1e0;
     		color: black;
     		border: 2px solid #555555;
     		border-radius: 8px;
     		margin-left: 1em;
-    		padding: 10px 16px;
+    		margin-bottom: 1em;
+    		padding: 5px 10px;
 		}
 
 		button:hover {
     		background-color: #555555;
     		color: white;
         }
+
+	      a:link {
+	      	color: black;
+ 	   		text-decoration: none;
+		}
+
+		a:visited {
+			color: black;
+    		text-decoration: none;
+		}
+		
+		a:hover {
+			color: white;
+		}
+		
       </style>
+      
       
     </head>
     <body id="body">
@@ -42,6 +59,9 @@
       <div>
 
 	<script>
+		document.getElementById('username').focus();
+		document.getElementById('username').select();
+	
       	document.getElementById("body").addEventListener("keyup", function(event) {
     		event.preventDefault();
     		if (event.keyCode == 13) {
@@ -59,7 +79,12 @@
             		if (xhr.responseText==='true') {
               			window.location = "/createTweetHTML";
             		} else {
-              			document.getElementById('output').innerHTML="Login Incorrect";
+              			document.getElementById('output').innerHTML="Login Incorrect.";
+              			document.getElementById('output').style.color = 'red';
+              			document.getElementById('username').value='';
+              			document.getElementById('password').value='';
+              			document.getElementById('username').focus();
+						document.getElementById('username').select();
             		}
         		} else if (xhr.status !== 200) {
             		alert('Request failed.  Returned status of ' + xhr.status);
