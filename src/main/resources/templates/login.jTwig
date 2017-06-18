@@ -2,43 +2,72 @@
 <html>
   <head>
       <title>JNT Messaging Login</title>
+      <style>
+      	body {
+        	padding: 1em;
+            overflow: hidden;
+            background-color: #f0f0f5;
+            box-shadow: 0px 1px 50px #5E5E5E;
+            height: 90vh;
+        }
+        
+        button {
+    		background-color: white;
+    		color: black;
+    		border: 2px solid #555555;
+    		border-radius: 8px;
+    		margin-left: 1em;
+    		padding: 10px 16px;
+		}
+
+		button:hover {
+    		background-color: #555555;
+    		color: white;
+        }
+      </style>
       
     </head>
-    <body>
-      <h2>Welcome to JNT Messaging</h2>
+    <body id="body">
+      <h2>Welcome to JNT Messaging!</h2>
       <div>
         User Name: <input type="text" id="username" name="username">
         <br>
         <br>
         Password: <input type="password" id="password" name="password"><br>
         <br>
-        <button type="submit" id= "login_button">Log In</button>
+        <button type="submit" id= "login">Log In</button>
         <button type="submit" value="newUser"><a href = "/createUser">New User</a></button>
       <div>
       <div id="output">
       <div>
-<script>
+
+	<script>
+      	document.getElementById("body").addEventListener("keyup", function(event) {
+    		event.preventDefault();
+    		if (event.keyCode == 13) {
+        		document.getElementById("login").click();
+    		}
+		});
       
-var button = document.getElementById('login_button');
-button.onclick = function () {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/login');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            if (xhr.responseText==='true') {
-              window.location = "/createTweetHTML";
-            } else {
-              document.getElementById('output').innerHTML="Login Incorrect";
-              ;
-            }
-        } else if (xhr.status !== 200) {
-            alert('Request failed.  Returned status of ' + xhr.status);
-        }
-    };
-    var login = {username: document.getElementById('username').value, password: document.getElementById('password').value};
-    xhr.send(JSON.stringify(login));
-};
+		var button = document.getElementById('login');
+		button.onclick = function () {
+    		var xhr = new XMLHttpRequest();
+    		xhr.open('POST', '/login');
+    		xhr.setRequestHeader('Content-Type', 'application/json');
+    		xhr.onload = function() {
+        		if (xhr.status === 200) {
+            		if (xhr.responseText==='true') {
+              			window.location = "/createTweetHTML";
+            		} else {
+              			document.getElementById('output').innerHTML="Login Incorrect";
+            		}
+        		} else if (xhr.status !== 200) {
+            		alert('Request failed.  Returned status of ' + xhr.status);
+        		}
+    		}
+    		var login = {username: document.getElementById('username').value, password: document.getElementById('password').value};
+    		xhr.send(JSON.stringify(login));
+		}
 </script>
     <body>
  </html>

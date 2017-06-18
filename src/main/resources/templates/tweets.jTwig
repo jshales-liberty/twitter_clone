@@ -136,7 +136,6 @@
         }
         
     {
-    
  	  	let tweet_button = document.getElementById('tweet');
  		tweet_button.onclick = function () {
  			var xhr = new XMLHttpRequest();

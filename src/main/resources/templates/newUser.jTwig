@@ -8,6 +8,7 @@
             overflow: hidden;
             background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
+            height: 90vh;
         }
         
         div {
@@ -30,7 +31,7 @@
         }
         
         button {
-    		background-color: white;
+    		background-color: #d1d1e0;
     		color: black;
     		border: 2px solid #555555;
     		border-radius: 8px;
@@ -45,7 +46,7 @@
         
       </style>
   </head>
-    <body>
+    <body id="body">
       <h2>Create New User</h2>
         <div>
           <input type="text" id="username">User Name
@@ -79,45 +80,108 @@
       </div>
     
     <script>
-    var button = document.getElementById('submit');
-    button.onclick = function () {
+    	document.getElementById("body").addEventListener("keyup", function(event) {
+    		event.preventDefault();
+    		if (event.keyCode == 13) {
+        		document.getElementById("submit").click();
+    		}
+		});
+    
+    
+		var button = document.getElementById('submit');
+    	button.onclick = function () {
+        
+      		var passwordMatch = validatePswMatch();
+	  		var allPresent = validateRequiredFields();
+	  		var tempBoolean = false;
       
-      var psw = document.getElementById('password').value;
-      var repsw = document.getElementById('reenterpsw').value;
-      var passwordMatch = validatePswMatch(psw, repsw);
-
-      if(passwordMatch){
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST', '/createUser');
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.onload = function() {
-              if (xhr.status === 200) {
-                  if ((xhr.responseText=='true') == true) {
-                    window.location = "/createTweetHTML";
-                  } else {
-                  document.getElementById('output').innerHTML="Username/Email already in use.";
-                }
-            } else if (xhr.status !== 200) {
-                alert('Request failed.  Returned status of ' + xhr.status);
-            }
-          }
-
-          var register = {username: document.getElementById('username').value, 
-          password: document.getElementById('password').value,
-          first_name: document.getElementById('firstName').value, 
-          last_name: document.getElementById('lastName').value,
-          birth_date: document.getElementById('birth_date').value, 
-          email_address: document.getElementById('email').value,
-          bio: document.getElementById('bio').value}; 
+      		if(allPresent && passwordMatch)  {
+       			var xhr = new XMLHttpRequest();
+       			xhr.open('POST', '/createUser');
+	       		xhr.setRequestHeader('Content-Type', 'application/json');
+   	      		xhr.onload = function() {
+       	    		if (xhr.status === 200) {
+           	    		if ((xhr.responseText=='true') == true) {
+               	    		window.location = "/createTweetHTML";
+               			} else {
+                 				document.getElementById('output').innerHTML="Username/Email already in use.";
+               			}
+           			} else if (xhr.status !== 200) {
+               			alert('Request failed.  Returned status of ' + xhr.status);
+           			}
+       			}
+  
+   	    		var register = {username: document.getElementById('username').value, 
+    			password: document.getElementById('password').value,
+        		first_name: document.getElementById('firstName').value, 
+	    		last_name: document.getElementById('lastName').value,
+    			birth_date: document.getElementById('birth_date').value, 
+        		email_address: document.getElementById('email').value,
+       			bio: document.getElementById('bio').value}; 
           
-          xhr.send(JSON.stringify(register));
-      }
+    			xhr.send(JSON.stringify(register));
+    		}
+    	}
+    
+    function validateRequiredFields(){
+    	var userNamePresent = false;
+    	var pswPresent = false;
+    	var rePswPresent = false;
+    	var emailPresent = false;
+    	var errorMessageExists = false;
+    	
+    	console.log(errorMessageExists);
+    	if(document.getElementById('username').value === '') {
+    		document.getElementById('username').style.borderColor = 'red';
+    	} else {
+    		document.getElementById('username').style.borderColor = 'initial';
+    		userNamePresent = true;
+    	}
+ 			
+		if(document.getElementById('password').value === ''){
+			document.getElementById('password').style.borderColor = 'red';
+		} else {
+			document.getElementById('password').style.borderColor = 'initial';
+			pswPresent = true;
+		}            
+        
+        if(document.getElementById('reenterpsw').value === '') {
+            document.getElementById('reenterpsw').style.borderColor = 'red';
+        } else {
+            document.getElementById('reenterpsw').style.borderColor = 'initial';
+            rePswPresent = true;
+        }
+   	
+    	if(document.getElementById('email').value === '') {
+            document.getElementById('email').style.borderColor = 'red';
+    	} else {
+    		document.getElementById('email').style.borderColor = 'initial';
+    		emailPresent = true;
+    	}
+    	
+    	if (userNamePresent && pswPresent && rePswPresent && emailPresent) {
+    		return true;
+    	}else {
+			if(!document.getElementById("missingFields")){
+    			var div = document.createElement('div');
+            	div.setAttribute('id', "missingFields");
+            	div.innerHTML = "Missing information.  Please provide required data."
+            	document.getElementById('output').appendChild(div);
+            	errorMessageExists = true;
+            }
+    	}
     }
     
-    function validatePswMatch(psw, reenterpsw) {
-      if(psw !== reenterpsw){
-        document.getElementById('output').innerHTML="Passwords do not match. Please reenter.";
-        
+    function validatePswMatch() {
+      var psw = document.getElementById('password').value;
+      var rePsw = document.getElementById('reenterpsw').value;
+    
+      if(psw !== rePsw){
+      		var div = document.createElement('div');
+        	div.setAttribute('id', 'passwordMatch');
+            div.innerHTML = "Passwords do not match. Please reenter. 2";
+            document.getElementById('output').appendChild(div);
+        	document.getElementById('output').innerHTML="Passwords do not match. Please reenter.";
         return false;
       } else {
         return true;
