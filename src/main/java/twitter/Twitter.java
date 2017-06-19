@@ -12,8 +12,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import static spark.Spark.port;
 
 import org.jtwig.JtwigModel;
@@ -26,7 +24,7 @@ import com.google.gson.JsonParser;
 
 public class Twitter {
 
-	final static String DB_URL = "jdbc:sqlite:twitterclone.db";
+	public static final String DB_URL = "jdbc:sqlite:twitterclone.db"; 
 
 	public static void main(String[] args) {
 
@@ -40,14 +38,12 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			int result = c.checkCredentials();
-
-			if (result == -1) {
-				return false;
-			} else {
-				request.session().attribute("username", c.getUsername());
-				request.session().attribute("user_id", result);
+			c=TwitterDB.checkCredentials(c);
+			if (c!=null) {
+				request.session().attribute("user", c);
 				return true;
+			} else {
+				return false;
 			}
 		});
 
@@ -59,39 +55,44 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			User d = new User(c.getFirst_name(), c.getLast_name(), c.getUsername(),
-					c.getEmail(), c.getBirth_date(), c.getBio(),
-					c.getPassword());
-			if (d.getId() == -1) {
+			if (!TwitterDB.checkExistence(c))
+				{c=TwitterDB.addUser(c);
+				request.session().attribute("user", c);
+				return true;}
+			 else {
 				return false;
-			} else {
-				request.session().attribute("username", d.getUsername());
-				request.session().attribute("user_id", d.checkCredentials());
-				return true;
+			} });
+
+		get("/createTweetHTML", (request, response) -> {
+			if(((User) request.session().attribute("user")) == null){
+				return createLoginHTML();
+			}else {
+				return createTweetPageHTML();
 			}
+
+		});
+
+		get("/tweetList", (request, response) -> {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return gson.toJson(getTweetList(((User) request.session().attribute("user")).getId()));
 		});
 
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			return gson.toJson(
-					getPopularTweeters(request.session().attribute("user_id")));
-		});
-
-		get("/createTweetHTML", (request, response) -> {
-			return createTweetPageHTML();
-
+					getPopularTweeters(((User) request.session().attribute("user")).getId()));
 		});
 
 		post("/submitTweet", (req, res) -> {
-			String body = req.body();
-			Gson gson = new Gson();
-			Tweet tweet = gson.fromJson(body, Tweet.class);
-			System.out.println(req.session().attribute("user_id").toString());
-			new Tweet(tweet.getTweet(), (req.session().attribute("user_id")));
-
-			return "jsonpost";
-		});
-
+            String body = req.body();
+            Gson gson = new Gson();
+            Tweet tweet = gson.fromJson(body, Tweet.class);
+            //System.out.println(req.session().attribute("user_id").toString());
+            new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()), ((User) req.session().attribute("user")).getUsername());
+            
+            return "jsonpost";
+        });	
+		
 		post("/submitFollow", (req, res) -> {
 			String body = req.body();
 
@@ -125,17 +126,9 @@ public class Twitter {
 		});
 
 		get("/logoff", (req, res) -> {
-			return createlogOffPageHTML(req.session().attribute("username"));
+			return createlogOffPageHTML(((User) req.session().attribute("user")).getUsername());
 		});
 
-	}
-
-	private static String createlogOffPageHTML(String username) {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/logOff.jTwig");
-		JtwigModel model = JtwigModel.newModel().with("username", username);
-
-		return template.render(model);
 	}
 
 	public static String createLoginHTML() {
@@ -155,6 +148,8 @@ public class Twitter {
 	}
 
 	public static String createTweetPageHTML() {
+		
+		
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel();
@@ -168,10 +163,9 @@ public class Twitter {
 		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
 
 		try (Connection conn = DriverManager.getConnection(url);
-				Statement stmt = conn.createStatement();) {
-			// String sql = "SELECT username FROM user_info LIMIT 3;";
-
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, userId);
 
@@ -184,5 +178,59 @@ public class Twitter {
 			System.out.println(e.getMessage());
 			return popularTweeters;
 		}
+	}
+	
+	public static ArrayList<Tweet> getTweetList(int userId) {
+		
+		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
+		
+		String sql = "SELECT t.TWEET 'Follows_Tweet', "
+				  		+ "t.user_id 'Follows_User_Id', "
+				  		+ "ui.username 'Follows_User_Name', "
+				  		+ "t.create_timestamp 'Tweet_Timestamp' "
+				  	+ "FROM TWEET t "
+				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "where t.user_id in (select distinct FOLLOWS_USER_ID from FOLLOWER "
+				  	+ "where USER_ID = ?) " 
+				  	+ "union "
+				  	+ "select t.TWEET  'Follows_Tweet', "
+				  		+ "t.user_id 'Follows_User_Id', "
+				  		+ "ui.username 'Follows_User_Name', "
+				  		+ "t.create_timestamp 'Tweet_TimeStamp' " 
+				  	+ "FROM tweet t "
+				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "where t.user_id = ? "
+				  	+ "ORDER BY t.create_timestamp DESC "
+				  	+ "LIMIT 100 ";
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, userId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				Tweet tweet = new Tweet(rs.getString("Follows_Tweet"), 
+						rs.getInt("Follows_User_Id"), 
+						rs.getString("Follows_User_Name"), 
+						rs.getString("Tweet_Timestamp"));
+				System.out.println(tweet.getTweet());
+				tweetsList.add(tweet);
+			}
+			return tweetsList;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return tweetsList;
+		}
+	}
+	
+	private static String createlogOffPageHTML(String username) {
+		JtwigTemplate template = JtwigTemplate
+				.classpathTemplate("templates/logOff.jTwig");
+		JtwigModel model = JtwigModel.newModel().with("username", username);
+
+		return template.render(model);
 	}
 }

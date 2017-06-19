@@ -9,10 +9,13 @@ import java.sql.Timestamp;
 public class Tweet {
 	private String tweet;
 	private int createdById;
+	private String createdByName;
+	private String createTimestamp;
 	
-	public Tweet(String tweet, int createdById) {
+	public Tweet(String tweet, int createdById, String createdByName) {
 		this.tweet = tweet;
 		this.createdById = createdById;
+		this.createdByName = createdByName;
 		
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
@@ -27,6 +30,13 @@ public class Tweet {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	public Tweet(String tweet, int createdById, String createdByName, String timestamp) {
+		this.tweet = tweet;
+		this.createdById = createdById;
+		this.createdByName = createdByName;
+		this.createTimestamp = timestamp;
 	}
 
 	public String getTweet() {

@@ -2,37 +2,6 @@
   <html>
     <head>
         <title>JNT Messaging Tweets</title>
-
-        <script>
-        	var xhr = new XMLHttpRequest();
-            	xhr.onload = function(evt) {
-            	if (xhr.status === 200) {
-                xhr.open('GET', '/popularTweeters');
-              	var response = JSON.parse(xhr.responseText);
-              	for(var i = 0; i < response.length; i++){
-              		var popularDiv = "popularDiv" + i;
-              		var div = document.createElement('div');
-              		div.setAttribute('id', popularDiv);
-
-              		var popularBtn = "popularBtn" + i;
-              		var btn = document.createElement('BUTTON');
-              		var btnText = document.createTextNode('Follow');
-              		btn.appendChild(btnText);
-              		btn.setAttribute('tweeter', response[i]);
-
-               		document.getElementById('popular_tweeters').appendChild(div);
-               		document.getElementById(popularDiv).appendChild(btn);
-               		var tweeter = document.createTextNode(response[i]);
-            			document.getElementById(popularDiv).appendChild(tweeter);
-               		}}
-              else if (xhr.status ===500) {window.location = "/login"}
-              else {
-                    alert('Request failed.  Returned status of ' + xhr.status);
-                }
-            };
-            xhr.send();
-        </script>
-
         <style>
            header {
             background-color:#262626;
@@ -110,36 +79,64 @@
           <aside id = "popular_tweeters">
             <h3>Popular Tweeters</h3>
           </aside>
-        <section class = "following_tweets">
-
-          <p>Test</p>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
+      <section class = "following_tweets" id = "following_tweets">  
       </section>
     </body>
     <script>
- 	  	var tweet_button = document.getElementById('tweet');
+        	/*Script to build popular tweeters aside */
+       {	
+        	let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/popularTweeters');
+            	xhr.onload = function(evt) {
+            	if (xhr.status === 200) {
+              		var response = JSON.parse(xhr.responseText);
+              		for(var i = 0; i < response.length; i++){              		
+              			var popularDiv = "popularDiv" + i;
+              			var div = document.createElement('div');
+              			div.setAttribute('id', popularDiv);
+              		
+              			var popularBtn = "popularBtn" + i;		
+              			var btn = document.createElement('BUTTON');
+              			var btnText = document.createTextNode('Follow');
+              			btn.appendChild(btnText);
+              			btn.setAttribute('tweeter', response[i]);
+               			
+               			document.getElementById('popular_tweeters').appendChild(div);
+               			document.getElementById(popularDiv).appendChild(btn);
+               			var tweeter = document.createTextNode(response[i]);
+               			document.getElementById(popularDiv).appendChild(tweeter);
+               			
+               		};
+                } else {
+                    console.log('Request popular tweeters failed.  Returned status of ' + xhr.status);
+                }
+            };
+            xhr.send();
+	    }
+        	/* Script to build tweets */
+        {	
+        	let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/tweetList');
+            	xhr.onload = function(evt) {
+            	if (xhr.status === 200) {
+              		var response = JSON.parse(xhr.responseText);
+              		for(var i = 0; i < response.length; i++){              		
+              			var tweet = "tweet" + i;
+              			
+              			var div = document.createElement('div');
+              			div.setAttribute('id', tweet);
+               			div.innerHTML = response[i].tweet;
+               			document.getElementById('following_tweets').appendChild(div);
+               		};
+                } else {
+                    console.log('Requesting tweets failed.  Returned status of ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+        
+    {
+ 	  	let tweet_button = document.getElementById('tweet');
  		tweet_button.onclick = function () {
  			var xhr = new XMLHttpRequest();
      		xhr.open('POST', '/submitTweet');
@@ -148,37 +145,37 @@
          		if (xhr.status === 200) {
              		console.log(xhr.responseText);
          		} else if (xhr.status !== 200) {
-             		alert('Request failed.  Returned status of ' + xhr.status);
+             		console.log('Request failed.  Returned status of ' + xhr.status);
          		}
      		};
      		var tweet = {tweet: document.getElementById("tweetTextArea").value};
 
      		xhr.send(JSON.stringify(tweet));
  	    };
-   </script>
-
-   <script>
-   		var tableClick = document.getElementById('popular_tweeters');
-
+	}
+   	
+   	{
+   		let tableClick = document.getElementById('popular_tweeters');
     	tableClick.addEventListener('click', function(evt) {
     		if (evt.target.tagName === 'BUTTON') {
-    			var tweeter = evt.target.getAttribute('tweeter');
+    			let tweeter = evt.target.getAttribute('tweeter');
 
- 				var xhr = new XMLHttpRequest();
+ 				let xhr = new XMLHttpRequest();
      			xhr.open('POST', '/submitFollow');
      			xhr.setRequestHeader('Content-Type', 'application/json');
      			xhr.onload = function() {
          			if (xhr.status === 200) {
              			console.log(xhr.responseText);
          			} else if (xhr.status !== 200) {
-             			alert('Request failed.  Returned status of ' + xhr.status);
+             			console.log('Request failed.  Returned status of ' + xhr.status);
          			}
      			};
-     			var tweet = {follows: tweeter};
-
+     			
+     			let tweet = {follows: tweeter};
+     	
      			xhr.send(JSON.stringify(tweet));
     		}
     	});
-
+    }
    </script>
    </html>
