@@ -2,16 +2,6 @@ package twitter;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-
 import static spark.Spark.port;
 
 import org.jtwig.JtwigModel;
@@ -23,9 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Twitter {
-
-	public static final String DB_URL = "jdbc:sqlite:twitterclone.db"; 
-
+ 
 	public static void main(String[] args) {
 
 		port(2613);
@@ -69,17 +57,16 @@ public class Twitter {
 			}else {
 				return createTweetPageHTML();
 			}
-
 		});
 
 		get("/tweetList", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(getTweetList(((User) request.session().attribute("user")).getId()));
+			return gson.toJson(TwitterDB.getTweetList(((User) request.session().attribute("user")).getId()));
 		});
 
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(	getPopularTweeters(((User) request.session().attribute("user")).getId()));
+			return gson.toJson(TwitterDB.getPopularTweeters(((User) request.session().attribute("user")).getId()));
 		});
 
 		post("/submitTweet", (req, res) -> {
@@ -124,9 +111,7 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static String createTweetPageHTML() {
-		
-		
+	public static String createTweetPageHTML() {		
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel();
@@ -134,73 +119,6 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static ArrayList<String> getPopularTweeters(int userId) {
-		ArrayList<String> popularTweeters = new ArrayList<String>();
-		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
-
-		try (Connection conn = DriverManager.getConnection(DB_URL);
-				Statement stmt = conn.createStatement();
-				PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, userId);
-
-			ResultSet rs = pstmt.executeQuery();
-			while (rs.next()) {
-				popularTweeters.add(rs.getString("username"));
-			}
-			return popularTweeters;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return popularTweeters;
-		}
-	}
-	
-	public static ArrayList<Tweet> getTweetList(int userId) {
-		
-		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
-		
-		String sql = "SELECT t.TWEET 'Follows_Tweet', "
-				  		+ "t.user_id 'Follows_User_Id', "
-				  		+ "ui.username 'Follows_User_Name', "
-				  		+ "t.create_timestamp 'Tweet_Timestamp' "
-				  	+ "FROM TWEET t "
-				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
-				  	+ "where t.user_id in (select distinct FOLLOWS_USER_ID from FOLLOWER "
-				  	+ "where USER_ID = ?) " 
-				  	+ "union "
-				  	+ "select t.TWEET  'Follows_Tweet', "
-				  		+ "t.user_id 'Follows_User_Id', "
-				  		+ "ui.username 'Follows_User_Name', "
-				  		+ "t.create_timestamp 'Tweet_TimeStamp' " 
-				  	+ "FROM tweet t "
-				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
-				  	+ "where t.user_id = ? "
-				  	+ "ORDER BY t.create_timestamp DESC "
-				  	+ "LIMIT 100 ";
-		try (Connection conn = DriverManager.getConnection(DB_URL);
-				Statement stmt = conn.createStatement();
-				PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			
-			pstmt.setInt(1, userId);
-			pstmt.setInt(2, userId);
-			
-			ResultSet rs = pstmt.executeQuery();
-			
-			while (rs.next()) {
-				Tweet tweet = new Tweet(rs.getString("Follows_Tweet"), 
-						rs.getInt("Follows_User_Id"), 
-						rs.getString("Follows_User_Name"), 
-						rs.getString("Tweet_Timestamp"));
-				tweetsList.add(tweet);
-			}
-			return tweetsList;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			return tweetsList;
-		}
-	}
-	
 	private static String createlogOffPageHTML(String username) {
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/logOff.jTwig");
