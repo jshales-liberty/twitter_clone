@@ -1,0 +1,109 @@
+  <!DOCTYPE html>
+  <html>
+  	<head>
+	  	<title>{{username}} Feed Page</title>
+
+	  	<style>
+	        header {
+	            background-color:#262626;
+	            width:100%;
+	            height:50px;
+	            box-shadow: 0px 1px 50px #5E5E5E;
+	            position:fixed;
+	            top:0px;
+	            color: white;
+	            z-index: 100;
+	        }
+
+            aside {
+	            float: left;
+    	        padding-left: 2em;
+        	    padding-right: 2em;
+            	padding-bottom: 2em;
+            	width: 175px;
+          	}
+
+	    	#logoff {
+				position: absolute;
+				right: 10px;
+			}
+		
+			button {
+  				display: inline-block;
+	  			font-size: 16px;
+	  			cursor: pointer;
+	  			text-align: center;
+	  			text-decoration: none;
+	  			outline: none;
+	  			background-color: black;
+	  			color: #fff;
+	  			border: none;
+	  			border-radius: 10px;
+	  			box-shadow: 0 5px #999;
+	  			margin-left: 1em;
+	    		margin-right: 1em;
+			}
+
+			button:hover {background-color: #3e8e41}
+
+			button:active {
+	  			background-color: #3e8e41;
+	  			box-shadow: 0 5px #666;
+	  			transform: translateY(4px);
+	  		}
+	  		
+		    a:link {
+		      	color: white;
+	 	   		text-decoration: none;
+	 	   		font-size: 16px;
+			}
+
+			a:visited {
+				color: white;
+	    		text-decoration: none;
+	    		font-size: 16px;
+			}
+			
+			a:hover {
+				color: white;
+			}
+
+			#activityList {
+	            text-align: center;
+	            padding: 1em;
+	            overflow: hidden;
+	            background-color: #f0f0f5;
+	            box-shadow: 0px 1px 50px #5E5E5E;
+	            height: 80vh;
+	        }
+
+	        input {
+	        	margin-left: 1em;
+	        }
+	    </style>
+    </head>
+    <body>
+	  	<header>
+          <br>
+          <form method = "POST">
+            <input type="text" name ="search" class = "search">
+            <button type="submit" id="search">Search</button>
+            <button id="logoff"><a href = "/logoff">Logoff</a></button>
+          </form>
+      	</header>
+      	<br>
+      	<br>
+      	<br>
+	  	<aside id = "follows">
+            <h3>{{username}} Follows</h3>
+        	<div class = "following_tweets" id = "following_tweets">  
+      		</div>
+        </aside>
+        <section id = "activityList">
+      		<h2>{{username}} Activities</h2>
+      		<div class = "tweets" id = "tweets">  
+      		</div>
+      	</section>
+
+    </body>
+   <html>
