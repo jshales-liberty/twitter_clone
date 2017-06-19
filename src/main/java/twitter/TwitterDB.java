@@ -146,6 +146,7 @@ public class TwitterDB {
 			return false; 
 		}
 	}
+	
 public static ArrayList<Tweet> getTweetList(int userId) {
 		
 		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
@@ -190,5 +191,27 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 			return tweetsList;
 		}
 	}
+
+	public static ArrayList<String> getPopularTweeters(int userId) {
+		ArrayList<String> popularTweeters = new ArrayList<String>();
+		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 3";
 	
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, userId);
+	
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				popularTweeters.add(rs.getString("username"));
+			}
+			return popularTweeters;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return popularTweeters;
+		}
+	}
+
 }

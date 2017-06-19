@@ -16,8 +16,7 @@ public class Tweet {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 		this.setCreateTimestamp(stringTimeStamp);
-		
-		
+
 	}
 	
 	public Tweet(String tweet, int createdById, String createdByName, String timestamp) {
