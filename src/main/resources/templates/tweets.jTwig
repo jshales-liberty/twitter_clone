@@ -108,8 +108,8 @@ td{
       <header>
           <br>
           <form method = "POST">
-            <input type="text" name ="search" class = "search">
-            <button type="submit" id="search">Search</button>
+            <input type="text" name ="search" id = "searchText">
+            <button type="submit" id="search">Search for User</button>
             <button id="logoff"><a href = "/logoff">Logoff</a></button>
           </form>
       </header>
@@ -239,5 +239,30 @@ td{
     		}
     	});
     }
+/*Script to go to search for a  user's page */
+   	{
+   		let tableClick = document.getElementById('search');
+    	tableClick.addEventListener('click', function(evt) {
+    		if (evt.target.tagName === 'BUTTON') {
+    			let user = evt.target.getAttribute('searchText);
+    			console.log(user);
+
+/* 				let xhr = new XMLHttpRequest();
+     			xhr.open('POST', '/submitFollow');
+     			xhr.setRequestHeader('Content-Type', 'application/json');
+     			xhr.onload = function() {
+         			if (xhr.status === 200) {
+             			console.log(xhr.responseText);
+         			} else if (xhr.status !== 200) {
+             			console.log('Request failed.  Returned status of ' + xhr.status);
+         			}
+     			};
+     			
+     			let tweet = {follows: tweeter};
+     	
+     			xhr.send(JSON.stringify(tweet));
+    		} */
+    	});
+    }    
    </script>
    </html>

@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Twitter {
- 
+
 	public static void main(String[] args) {
 
 		port(2613);
@@ -26,8 +26,8 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			c=TwitterDB.checkCredentials(c);
-			if (c!=null) {
+			c = TwitterDB.checkCredentials(c);
+			if (c != null) {
 				request.session().attribute("user", c);
 				return true;
 			} else {
@@ -43,18 +43,19 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			if (!TwitterDB.checkExistence(c))
-				{c=TwitterDB.addUser(c);
+			if (!TwitterDB.checkExistence(c)) {
+				c = TwitterDB.addUser(c);
 				request.session().attribute("user", c);
-				return true;}
-			 else {
+				return true;
+			} else {
 				return false;
-			} });
+			}
+		});
 
 		get("/createTweetHTML", (request, response) -> {
-			if(((User) request.session().attribute("user")) == null){
+			if (((User) request.session().attribute("user")) == null) {
 				return createLoginHTML();
-			}else {
+			} else {
 				return createTweetPageHTML();
 			}
 		});
@@ -70,20 +71,21 @@ public class Twitter {
 		});
 
 		post("/submitTweet", (req, res) -> {
-            String body = req.body();
-            Gson gson = new Gson();
-            Tweet tweet = gson.fromJson(body, Tweet.class);
-            new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()), ((User) req.session().attribute("user")).getUsername());
-            
-            return "jsonpost";
-        });	
-		
+			String body = req.body();
+			Gson gson = new Gson();
+			Tweet tweet = gson.fromJson(body, Tweet.class);
+			new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()),
+					((User) req.session().attribute("user")).getUsername());
+
+			return "jsonpost";
+		});
+
 		post("/submitFollow", (req, res) -> {
 			String body = req.body();
 
 			JsonParser parser = new JsonParser();
 			JsonObject obj = parser.parse(body).getAsJsonObject();
-			
+
 			User userBeingFollowed = TwitterDB.findUser(obj.get("follows").getAsString());
 			return TwitterDB.followSomeone(((User) req.session().attribute("user")).getId(), userBeingFollowed.getId());
 		});
@@ -96,32 +98,28 @@ public class Twitter {
 	}
 
 	public static String createLoginHTML() {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/login.jTwig");
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jTwig");
 		JtwigModel model = JtwigModel.newModel();
 
 		return template.render(model);
 	}
 
 	public static String createNewUserHTML() {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/newUser.jTwig");
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/newUser.jTwig");
 		JtwigModel model = JtwigModel.newModel();
 
 		return template.render(model);
 	}
 
-	public static String createTweetPageHTML() {		
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/tweets.jTwig");
+	public static String createTweetPageHTML() {
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel();
 
 		return template.render(model);
 	}
 
 	private static String createlogOffPageHTML(String username) {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/logOff.jTwig");
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logOff.jTwig");
 		JtwigModel model = JtwigModel.newModel().with("username", username);
 
 		return template.render(model);
