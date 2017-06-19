@@ -28,6 +28,7 @@
             overflow: hidden;
             background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
+            height: 60vh;
           }
 
           .search {
@@ -52,28 +53,39 @@
 		}
 		
 		button {
-    		background-color: #d1d1e0;
-    		color: black;
-    		border: 2px solid #555555;
-    		border-radius: 8px;
-    		margin-left: 1em;
+  			display: inline-block;
+  			font-size: 16px;
+  			cursor: pointer;
+  			text-align: center;
+  			text-decoration: none;
+  			outline: none;
+  			background-color: black;
+  			color: #fff;
+  			border: none;
+  			border-radius: 10px;
+  			box-shadow: 0 5px #999;
+  			margin-left: 1em;
     		margin-right: 1em;
-    		padding: 5px 10px;
 		}
 
-		button:hover {
-    		background-color: #555555;
-    		color: white;
-        }
+		button:hover {background-color: #3e8e41}
 
-	      a:link {
-	      	color: black;
+		button:active {
+  			background-color: #3e8e41;
+  			box-shadow: 0 5px #666;
+  			transform: translateY(4px);
+  		}
+  		
+	    a:link {
+	      	color: white;
  	   		text-decoration: none;
+ 	   		font-size: 16px;
 		}
 
 		a:visited {
-			color: black;
+			color: white;
     		text-decoration: none;
+    		font-size: 16px;
 		}
 		
 		a:hover {
@@ -108,7 +120,7 @@
       </section>
     </body>
     <script>
-        	/*Script to build popular tweeters aside */
+/*Script to build popular tweeters aside */
        {	
         	let xhr = new XMLHttpRequest();
             xhr.open('GET', '/popularTweeters');
@@ -138,7 +150,7 @@
             };
             xhr.send();
 	    }
-        	/* Script to build tweets */
+/* Script to build tweets */
         {	
         	let xhr = new XMLHttpRequest();
             xhr.open('GET', '/tweetList');
@@ -159,26 +171,30 @@
             };
             xhr.send();
         }
-        
+
+/*Script to send tweet to database */        
     {
  	  	let tweet_button = document.getElementById('tweet');
  		tweet_button.onclick = function () {
- 			var xhr = new XMLHttpRequest();
-     		xhr.open('POST', '/submitTweet');
-     		xhr.setRequestHeader('Content-Type', 'application/json');
-     		xhr.onload = function() {
-         		if (xhr.status === 200) {
-             		console.log(xhr.responseText);
-         		} else if (xhr.status !== 200) {
-             		console.log('Request failed.  Returned status of ' + xhr.status);
-         		}
-     		};
-     		var tweet = {tweet: document.getElementById("tweetTextArea").value};
+ 			if(document.getElementById('tweetTextArea').value !==''){
+ 				var xhr = new XMLHttpRequest();
+     			xhr.open('POST', '/submitTweet');
+     			xhr.setRequestHeader('Content-Type', 'application/json');
+     			xhr.onload = function() {
+         			if (xhr.status === 200) {
+             			console.log(xhr.responseText);
+         			} else if (xhr.status !== 200) {
+             			console.log('Request failed.  Returned status of ' + xhr.status);
+         			}
+     			};
+     			var tweet = {tweet: document.getElementById("tweetTextArea").value};
 
-     		xhr.send(JSON.stringify(tweet));
- 	    };
+     			xhr.send(JSON.stringify(tweet));
+     		}
+ 	    }
 	}
-   	
+
+/*Script to follow someone*/   	
    	{
    		let tableClick = document.getElementById('popular_tweeters');
     	tableClick.addEventListener('click', function(evt) {

@@ -38,14 +38,12 @@ public class Twitter {
 			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			int result = c.checkCredentials(); //returns user id
-
-			if (result == -1) {
-				return false;
-			} else {
-				request.session().attribute("username", c.getUsername());
-				request.session().attribute("user_id", result);
+			c=TwitterDB.checkCredentials(c);
+			if (c!=null) {
+				request.session().attribute("user", c);
 				return true;
+			} else {
+				return false;
 			}
 		});
 
@@ -54,25 +52,19 @@ public class Twitter {
 		});
 
 		post("/createUser", (request, response) -> {
-			try{String body = request.body();
+			String body = request.body();
 			Gson gson = new Gson();
 			User c = gson.fromJson(body, User.class);
-			User d = new User(c.getFirst_name(), c.getLast_name(),
-					c.getUsername(), c.getEmail(), c.getBirth_date(),
-					c.getBio(), c.getPassword());
-			d.setId(d.checkCredentials());
-			if (d.getId() == -1) {
+			if (!TwitterDB.checkExistence(c))
+				{c=TwitterDB.addUser(c);
+				request.session().attribute("user", c);
+				return true;}
+			 else {
 				return false;
-			} else {
-				request.session().attribute("username", d.getUsername());
-				request.session().attribute("user_id", d.checkCredentials());
-				return true;
-			}} catch (Exception e) {System.out.println(e.getMessage());
-			return false;} 
-		});
+			} });
 
 		get("/createTweetHTML", (request, response) -> {
-			if(request.session().attribute("user_id") == null){
+			if(((User) request.session().attribute("user")) == null){
 				return createLoginHTML();
 			}else {
 				return createTweetPageHTML();
@@ -82,21 +74,19 @@ public class Twitter {
 
 		get("/tweetList", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(getTweetList(request.session().attribute("user_id")));
+			return gson.toJson(getTweetList(((User) request.session().attribute("user")).getId()));
 		});
 
 		get("/popularTweeters", (request, response) -> {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			return gson.toJson(
-					getPopularTweeters(request.session().attribute("user_id")));
+			return gson.toJson(	getPopularTweeters(((User) request.session().attribute("user")).getId()));
 		});
 
 		post("/submitTweet", (req, res) -> {
             String body = req.body();
             Gson gson = new Gson();
             Tweet tweet = gson.fromJson(body, Tweet.class);
-            System.out.println(req.session().attribute("user_id").toString());
-            new Tweet(tweet.getTweet(), (req.session().attribute("user_id")), req.session().attribute("username"));
+            new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()), ((User) req.session().attribute("user")).getUsername());
             
             return "jsonpost";
         });	
@@ -106,37 +96,14 @@ public class Twitter {
 
 			JsonParser parser = new JsonParser();
 			JsonObject obj = parser.parse(body).getAsJsonObject();
-
-			String selectSql = "SELECT user_id FROM user_info WHERE username = ?";
-			String insertSql = "INSERT INTO follower(user_id, follows_user_id, create_timestamp) VALUES(?,?,?)";
-
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			String stringTimeStamp = timestamp.toString();
-
-			try (Connection conn = DriverManager.getConnection(DB_URL);
-					PreparedStatement pstmtSelect = conn
-							.prepareStatement(selectSql);
-					PreparedStatement pstmtInsert = conn
-							.prepareStatement(insertSql);) {
-
-				pstmtSelect.setString(1, obj.get("follows").getAsString());
-				ResultSet rs = pstmtSelect.executeQuery();
-
-				pstmtInsert.setInt(1, req.session().attribute("user_id"));
-				pstmtInsert.setInt(2, rs.getInt("user_id"));
-				pstmtInsert.setString(3, stringTimeStamp);
-				pstmtInsert.executeUpdate();
-
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			}
-			return req;
+			
+			User userBeingFollowed = TwitterDB.findUser(obj.get("follows").getAsString());
+			return TwitterDB.followSomeone(((User) req.session().attribute("user")).getId(), userBeingFollowed.getId());
 		});
 
 		get("/logoff", (req, res) -> {
-			String userName = req.session().attribute("username");
-			req.session().attribute("username", "");
-			req.session().attribute("user_id", "");
+			String userName = ((User) req.session().attribute("user")).getUsername();
+			req.session().removeAttribute("user");
 			return createlogOffPageHTML(userName);
 		});
 	}
@@ -225,7 +192,6 @@ public class Twitter {
 						rs.getInt("Follows_User_Id"), 
 						rs.getString("Follows_User_Name"), 
 						rs.getString("Tweet_Timestamp"));
-				System.out.println(tweet.getTweet());
 				tweetsList.add(tweet);
 			}
 			return tweetsList;
