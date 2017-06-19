@@ -1,35 +1,60 @@
 <!DOCTYPE html>
 <html>
-    <head> 
+
+    <head>
       <title>JNT Messaging New User</title>
       <style>
-        body {
-        	padding: 1em;
-            overflow: hidden;
-            background-color: #f0f0f5;
-            box-shadow: 0px 1px 50px #5E5E5E;
-            height: 90vh;
+html {
+  margin: 0;
+  padding: 0;
+}
+       body {
+       	padding: 0;
+         overflow: hidden;
+         background-color: #f0f0f5;
+         /*box-shadow: 0px 1px 50px #5E5E5E;*/
+         height: 90vh;
+       }
+
+      nav{
+       background-color:#262626;
+       width:100%;
+       height:10px;
+       box-shadow: 8px 1px 50px #5E5E5E;
+       position:fixed;
+       top:1px;
+       color: white;
+       z-index: 100;
+       font-size: :36px;
+       text-align: center;
+       padding: 1em 0;
+     }
+
+        main {
+          background-image: url("https://vignette2.wikia.nocookie.net/parody/images/8/8f/Tweety_Bird.png/revision/latest?cb=20151024151745");
+          background-repeat: no-repeat;
+          background-position: right top;
         }
-        
+
         div {
         	margin-bottom: 1em;
         }
-        
+
         input {
         	margin-right: 1em;
         	margin-left: 1em;
         }
-        
+
         textarea {
         	margin-right: 1em;
         	margin-left: 1em;
         }
-        
+
         #output {
         	color: red;
         	margin: 1em;
         }
-        
+
         button {
     		background-color: #d1d1e0;
     		color: black;
@@ -39,14 +64,21 @@
     		padding: 5px 10px;
 		}
 
+
 		button:hover {
     		background-color: #555555;
     		color: white;
         }
-        
+
+
       </style>
   </head>
     <body id="body">
+      <br>
+    </br>
+ <nav> <center>Weclome to JNT Messaging!</center></nav>
+ <main>
+
       <h2>Create New User</h2>
         <div>
           <input type="text" id="username">User Name
@@ -55,7 +87,7 @@
           <input type="password" id="password">Password
       </div>
       <div>
-          <input type="password" id="reenterpsw">Reenter Password 
+          <input type="password" id="reenterpsw">Reenter Password
       </div>
       <div>
           <input type="text" id ="firstName">First Name
@@ -65,20 +97,22 @@
       </div>
       <div>
           <input type="date" id ="birth_date">Birth Date
-      </div>
+        </div>
       <div>
           <input type="text" id ="email">Email
       </div>
       <div>
           <textarea rows="4" cols="50" id = "bio"></textarea>Bio
       </div>
-      <div>    
+      <div>
           <button type="submit" id="submit">Submit</button>
       <div>
-        
+
       <div id="output">
       </div>
-    
+
+    </main>
+
     <script>
     	document.getElementById("body").addEventListener("keyup", function(event) {
     		event.preventDefault();
@@ -86,15 +120,15 @@
         		document.getElementById("submit").click();
     		}
 		});
-    
-    
+
+
 		var button = document.getElementById('submit');
     	button.onclick = function () {
-        
+
       		var passwordMatch = validatePswMatch();
 	  		var allPresent = validateRequiredFields();
 	  		var tempBoolean = false;
-      
+
       		if(allPresent && passwordMatch)  {
        			var xhr = new XMLHttpRequest();
        			xhr.open('POST', '/createUser');
@@ -110,26 +144,26 @@
                			alert('Request failed.  Returned status of ' + xhr.status);
            			}
        			}
-  
-   	    		var register = {username: document.getElementById('username').value, 
+
+   	    		var register = {username: document.getElementById('username').value,
     			password: document.getElementById('password').value,
-        		first_name: document.getElementById('firstName').value, 
+        		first_name: document.getElementById('firstName').value,
 	    		last_name: document.getElementById('lastName').value,
-    			birth_date: document.getElementById('birth_date').value, 
+    			birth_date: document.getElementById('birth_date').value,
         		email_address: document.getElementById('email').value,
-       			bio: document.getElementById('bio').value}; 
-          
+       			bio: document.getElementById('bio').value};
+
     			xhr.send(JSON.stringify(register));
     		}
     	}
-    
+
     function validateRequiredFields(){
     	var userNamePresent = false;
     	var pswPresent = false;
     	var rePswPresent = false;
     	var emailPresent = false;
     	var errorMessageExists = false;
-    	
+
     	console.log(errorMessageExists);
     	if(document.getElementById('username').value === '') {
     		document.getElementById('username').style.borderColor = 'red';
@@ -137,28 +171,28 @@
     		document.getElementById('username').style.borderColor = 'initial';
     		userNamePresent = true;
     	}
- 			
+
 		if(document.getElementById('password').value === ''){
 			document.getElementById('password').style.borderColor = 'red';
 		} else {
 			document.getElementById('password').style.borderColor = 'initial';
 			pswPresent = true;
-		}            
-        
+		}
+
         if(document.getElementById('reenterpsw').value === '') {
             document.getElementById('reenterpsw').style.borderColor = 'red';
         } else {
             document.getElementById('reenterpsw').style.borderColor = 'initial';
             rePswPresent = true;
         }
-   	
+
     	if(document.getElementById('email').value === '') {
             document.getElementById('email').style.borderColor = 'red';
     	} else {
     		document.getElementById('email').style.borderColor = 'initial';
     		emailPresent = true;
     	}
-    	
+
     	if (userNamePresent && pswPresent && rePswPresent && emailPresent) {
     		return true;
     	}else {
@@ -171,11 +205,11 @@
             }
     	}
     }
-    
+
     function validatePswMatch() {
       var psw = document.getElementById('password').value;
       var rePsw = document.getElementById('reenterpsw').value;
-    
+
       if(psw !== rePsw){
       		var div = document.createElement('div');
         	div.setAttribute('id', 'passwordMatch');
@@ -188,5 +222,5 @@
       }
     }
   </script>
-    <body>
+</body>
  </html>
