@@ -56,7 +56,7 @@ public class Twitter {
 			if (((User) request.session().attribute("user")) == null) {
 				return createLoginHTML();
 			} else {
-				return createTweetPageHTML();
+				return createTweetPageHTML(((User) request.session().attribute("user")).getUsername());
 			}
 		});
 
@@ -71,15 +71,14 @@ public class Twitter {
 		});
 
 		post("/submitTweet", (req, res) -> {
-			String body = req.body();
-			Gson gson = new Gson();
-			Tweet tweet = gson.fromJson(body, Tweet.class);
-			new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()),
-					((User) req.session().attribute("user")).getUsername());
-
-			return "jsonpost";
-		});
-
+            String body = req.body();
+            Gson gson = new Gson();
+            Tweet tweet = gson.fromJson(body, Tweet.class);
+            TwitterDB.createTweet(new Tweet(tweet.getTweet(), (((User) req.session().attribute("user")).getId()), ((User) req.session().attribute("user")).getUsername()));
+            
+            return "jsonpost";
+        });	
+		
 		post("/submitFollow", (req, res) -> {
 			String body = req.body();
 
@@ -111,9 +110,9 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static String createTweetPageHTML() {
+	public static String createTweetPageHTML(String username) {
 		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/tweets.jTwig");
-		JtwigModel model = JtwigModel.newModel();
+		JtwigModel model = JtwigModel.newModel().with("username", username);;
 
 		return template.render(model);
 	}
