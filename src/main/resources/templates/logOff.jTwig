@@ -18,16 +18,16 @@
         }
       </style>
 
-
   </head>
 
   <body>
   <h1> <center>Thank you, {{username}} for visiting JNT Messaging!</center></h1>
       <div>
-
-
         <br>
         <br>
       </div>
+      <script>
+      		
+      </script>
     <body>
  </html>

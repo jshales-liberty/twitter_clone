@@ -94,6 +94,16 @@ public class Twitter {
 			req.session().removeAttribute("user");
 			return createlogOffPageHTML(userName);
 		});
+		
+		post("/submitUnfollow", (req,res) -> {
+			String body = req.body();
+			
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(body).getAsJsonObject();
+			
+			User userBeingUnfollowed = TwitterDB.findUser(obj.get("follows").getAsString());
+			return TwitterDB.unfollowSomeone(((User) req.session().attribute("user")).getId(), userBeingUnfollowed.getId());
+		});
 	}
 
 	public static String createLoginHTML() {
