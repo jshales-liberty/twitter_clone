@@ -177,7 +177,7 @@
                			var hrefValue = "/userActivity?UserName='" + response[i] + "'";
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i]);
-        				createA.setAttribute('href', "http://google.com");
+        				createA.setAttribute('href', hrefValue);
         				createA.appendChild(createAText);
         				
                			document.getElementById('popular_tweeters').appendChild(div);
@@ -234,7 +234,7 @@
               			var hrefValue = "/userActivity?UserName='" + response[i].createdByName + "'";
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i].createdByName);
-        				createA.setAttribute('href', "http://google.com");
+        				createA.setAttribute('href', hrefValue);
         				createA.appendChild(createAText);
         				var newCell = row.insertCell(2);
         				newCell.appendChild(createA);

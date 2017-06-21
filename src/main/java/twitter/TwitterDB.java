@@ -37,7 +37,8 @@ public class TwitterDB {
 		try (Connection conn = DriverManager.getConnection(DB_URL);
 				PreparedStatement pstmt_create = conn.prepareStatement(
 						"INSERT INTO user_info(username, password, first_name, last_name, birth_date, email_address, bio, create_timestamp) VALUES(?,?,?,?,?,?,?,?)");) {
-			PreparedStatement pstmt_pullID = conn.prepareStatement("Select user_id from user_info where username = ?;");
+			PreparedStatement pstmt_pullID = conn.prepareStatement(
+					"Select user_id from user_info where username = ?;");
 			pstmt_create.setString(3, u.getFirst_name());
 			pstmt_create.setString(4, u.getLast_name());
 			pstmt_create.setString(7, u.getBio());
@@ -60,8 +61,8 @@ public class TwitterDB {
 	public static User checkCredentials(User u) {
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
-				PreparedStatement pstmt = conn
-						.prepareStatement("Select * from user_info where username = ? and password = ?;");) {
+				PreparedStatement pstmt = conn.prepareStatement(
+						"Select * from user_info where username = ? and password = ?;");) {
 			pstmt.setString(1, u.getUsername());
 			pstmt.setString(2, u.getPassword());
 			ResultSet rs = pstmt.executeQuery();
@@ -83,27 +84,28 @@ public class TwitterDB {
 			return null;
 		}
 	}
-	
-	public static User findUser(String userName){
+
+	public static User findUser(String userName) {
 		String selectSql = "SELECT * FROM user_info WHERE username = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
-				PreparedStatement pstmtSelect = conn.prepareStatement(selectSql)) {
-
+				PreparedStatement pstmtSelect = conn
+						.prepareStatement(selectSql)) {
+			System.out.println(userName);
 			pstmtSelect.setString(1, userName);
 			ResultSet rs = pstmtSelect.executeQuery();
-			if (rs.isBeforeFirst()) {
+			while (rs.next()) {
 				User u;
 				try {
-					u = new User(rs.getString("first_name"), rs.getString("last_name"), 
-									  rs.getString("username"), rs.getString("email_address"), 
-									  rs.getString("bio"), rs.getString("birth_date")," ");
+					u = new User(rs.getString("first_name"),
+							rs.getString("last_name"), rs.getString("username"),
+							rs.getString("email_address"), rs.getString("bio"),
+							rs.getString("birth_date"), " ");
 					u.setId(rs.getInt("user_id"));
 					return u;
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
 				}
-			} else {
 				return null;
 			}
 		} catch (SQLException e) {
@@ -111,10 +113,11 @@ public class TwitterDB {
 		}
 		return null;
 	}
-	
-	public static boolean createTweet(Tweet insertTweet){
+
+	public static boolean createTweet(Tweet insertTweet) {
 		try (Connection conn = DriverManager.getConnection(DB_URL);
-				PreparedStatement pstmt = conn.prepareStatement("INSERT INTO tweet(user_id, tweet, create_timestamp) VALUES(?,?,?)");){
+				PreparedStatement pstmt = conn.prepareStatement(
+						"INSERT INTO tweet(user_id, tweet, create_timestamp) VALUES(?,?,?)");) {
 			pstmt.setInt(1, insertTweet.getCreatedBy());
 			pstmt.setString(2, insertTweet.getTweet());
 			pstmt.setString(3, insertTweet.getCreateTimestamp());
@@ -125,30 +128,68 @@ public class TwitterDB {
 			return false;
 		}
 	}
-	
-	public static boolean followSomeone(int activeUserId, int userBeingFollowedId){
+
+	public static int getUserId(String username) {
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmt = conn.prepareStatement(
+						"SELECT user_id from user_info where username = ?;");) {
+			pstmt.setString(1, username);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				return rs.getInt("user_id");
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return -1;
+	}
+
+	public static boolean followSomeone(int activeUserId,
+			int userBeingFollowedId) {
 		String insertSql = "INSERT INTO follower(user_id, follows_user_id, create_timestamp) VALUES(?,?,?)";
 
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
-				PreparedStatement pstmtInsert = conn.prepareStatement(insertSql);) {
-			
-			pstmtInsert.setInt(1, activeUserId);				
+				PreparedStatement pstmtInsert = conn
+						.prepareStatement(insertSql);) {
+
+			pstmtInsert.setInt(1, activeUserId);
 			pstmtInsert.setInt(2, userBeingFollowedId);
 			pstmtInsert.setString(3, stringTimeStamp);
 			pstmtInsert.executeUpdate();
-			
+
 			return true;
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-			return false; 
+			return false;
 		}
 	}
 	
-public static ArrayList<Tweet> getTweetList(int userId) {
-		
+	public static ArrayList<String> getUserFollows(int pageUserId) {
+		  
+			ArrayList<String> followers = new ArrayList<String>();
+			String sql = "SELECT DISTINCT u.username FROM Follower f Left join user_info u on f.follows_user_id = u.user_id Where f.user_id = ? LIMIT 8;";
+
+			try (Connection conn = DriverManager.getConnection(DB_URL);
+					Statement stmt = conn.createStatement();
+					PreparedStatement pstmt = conn.prepareStatement(sql);) {
+
+				pstmt.setInt(1, pageUserId);
+
+				ResultSet rs = pstmt.executeQuery();
+				while (rs.next()) {
+					followers.add(rs.getString("username"));
+				}
+				return followers;
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+				return null;}
+			}
+
+	public static ArrayList<Tweet> getTweetList(int userId) {
+
 		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
 		
 		String sql = "SELECT t.tweet 'Follows_Tweet', "
@@ -174,12 +215,12 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 		try (Connection conn = DriverManager.getConnection(DB_URL);
 				Statement stmt = conn.createStatement();
 				PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			
+
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, userId);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
 				Tweet tweet = new Tweet(
 						rs.getString("Follows_Tweet"),
@@ -195,18 +236,52 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 			return tweetsList;
 		}
 	}
+	
+	public static ArrayList<Tweet> getUserTweets(int userId) {
+
+		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
+
+		String sql = "SELECT t.TWEET, "
+				+ "t.tweet_id, "
+				+ "ui.username, t.user_id, "
+				+ "t.create_timestamp " + "FROM TWEET t "
+				+ "Left Join user_info ui on ui.user_id = t.user_id "
+				+ "where t.user_id = ? " + "ORDER BY t.create_timestamp DESC "
+				+ "LIMIT 100 ";
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+
+			pstmt.setInt(1, userId);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				Tweet tweet = new Tweet(rs.getString("Tweet"),
+						rs.getInt("tweet_id"),
+						rs.getInt("user_id"),
+						rs.getString("username"),
+						rs.getString("create_timestamp"));
+				tweetsList.add(tweet);
+			}
+			return tweetsList;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return tweetsList;
+		}
+	}
 
 	public static ArrayList<String> getPopularTweeters(int userId) {
 		ArrayList<String> popularTweeters = new ArrayList<String>();
 		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 8";
-	
+
 		try (Connection conn = DriverManager.getConnection(DB_URL);
 				Statement stmt = conn.createStatement();
 				PreparedStatement pstmt = conn.prepareStatement(sql);) {
-			
+
 			pstmt.setInt(1, userId);
 			pstmt.setInt(2, userId);
-	
+
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				popularTweeters.add(rs.getString("username"));
