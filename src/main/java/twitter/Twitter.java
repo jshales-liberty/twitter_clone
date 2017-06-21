@@ -2,6 +2,9 @@ package twitter;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+
+import java.util.ArrayList;
+
 import static spark.Spark.port;
 
 import org.jtwig.JtwigModel;
@@ -94,6 +97,21 @@ public class Twitter {
 			req.session().removeAttribute("user");
 			return createlogOffPageHTML(userName);
 		});
+		
+		get("/userActivity", (req, res) -> {
+			String user = req.queryParams("UserName");
+			user = user.replace("\'", "");
+			User newuser = TwitterDB.findUser(user);
+			int id = newuser.getId();
+			return createUserPage(user, TwitterDB.getUserTweets(id), TwitterDB.getUserFollows(id));
+		});
+		
+		get("/userTweets", (req, res) -> {
+			String user = req.queryParams("UserName");
+			int id = TwitterDB.getUserId(user);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return gson.toJson(TwitterDB.getUserTweets(id));
+		});
 	}
 
 	public static String createLoginHTML() {
@@ -106,6 +124,13 @@ public class Twitter {
 	public static String createNewUserHTML() {
 		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/newUser.jTwig");
 		JtwigModel model = JtwigModel.newModel();
+
+		return template.render(model);
+	}
+	
+	public static String createUserPage(String username, ArrayList<Tweet> tweets, ArrayList<String> follows) {
+		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userActivity.jTwig");
+		JtwigModel model = JtwigModel.newModel().with("username", username).with("tweets", tweets).with("follows", follows);
 
 		return template.render(model);
 	}

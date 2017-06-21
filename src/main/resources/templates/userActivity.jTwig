@@ -53,19 +53,19 @@
 	  		}
 	  		
 		    a:link {
-		      	color: white;
+		      	color: blue;
 	 	   		text-decoration: none;
 	 	   		font-size: 16px;
 			}
 
 			a:visited {
-				color: white;
+				color: blue;
 	    		text-decoration: none;
 	    		font-size: 16px;
 			}
 			
 			a:hover {
-				color: white;
+				color: blue;
 			}
 
 			#activityList {
@@ -96,14 +96,30 @@
       	<br>
 	  	<aside id = "follows">
             <h3>{{username}} Follows</h3>
-        	<div class = "following_tweets" id = "following_tweets">  
-      		</div>
+        	<table class = "following_tweets" id = "following_tweets"> 
+        	<tr><td><b>Following</b></td></tr> 
+        	{% for f in follows %}
+        	<tr>
+        	<td><a href="/userActivity?UserName='{{f}}'">{{f}}
+        	</a></td></tr>
+        	{% endfor %}
+      		</table>
         </aside>
         <section id = "activityList">
       		<h2>{{username}} Activities</h2>
-      		<div class = "tweets" id = "tweets">  
-      		</div>
+      		<table class = "tweets" id = "tweets">
+      		<tr><td><b>Tweet</b></td>
+      		<td><b>Author</b></td>
+      		<td><b>Post Date</b></td>
+      		</tr>
+      		{% for t in tweets %}
+      		<tr>
+      		<td>{{t.tweet}}</td>
+      		<td>{{t.createdByName}}</td>
+      		<td>{{t.createTimestamp}}</td>
+      		</tr>
+      		{% endfor %}  
+      		</table>
       	</section>
-
     </body>
-   <html>
+   </html>

@@ -173,7 +173,7 @@
                			console.log(hrefValue); 
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i]);
-        				createA.setAttribute('href', "http://google.com");
+        				createA.setAttribute('href', hrefValue);
         				createA.appendChild(createAText);
         				
                			document.getElementById('popular_tweeters').appendChild(div);
@@ -209,7 +209,7 @@
                			console.log(hrefValue); 
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i].createdByName);
-        				createA.setAttribute('href', "http://google.com");
+        				createA.setAttribute('href', hrefValue);
         				createA.appendChild(createAText);
               			
               			var unfollowBtn = "unfollowBtn" + i;		
