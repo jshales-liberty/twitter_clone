@@ -57,12 +57,14 @@
         <br>
         <br>
         <button type="submit" id= "login"><a href = "/login">Log In</a></button>
-
       <div>
         <br>
         <br>
       </div>
     <script>
+    setTimeout(function()     {
+    window.location.href = "/login";
+},8000)
 </script>
     <body>
  </html>
