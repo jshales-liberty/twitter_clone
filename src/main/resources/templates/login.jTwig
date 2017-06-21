@@ -3,48 +3,60 @@
   <head>
       <title>JNT Messaging Login</title>
       <style>
-      	body {
-        	padding: 1em;
-            overflow: hidden;
-            background-color: #f0f0f5;
-            box-shadow: 0px 1px 50px #5E5E5E;
-            height: 90vh;
-        }
-        
-        button {
-    		background-color: #d1d1e0;
-    		color: black;
-    		border: 2px solid #555555;
-    		border-radius: 8px;
-    		margin-left: 1em;
-    		margin-bottom: 1em;
-    		padding: 5px 10px;
-		}
+      main {
+        background-image: url("https://vignette2.wikia.nocookie.net/parody/images/8/8f/Tweety_Bird.png/revision/latest?cb=20151024151745");
+        background-repeat: no-repeat;
+        background-position: right top;
+        min-height: 500px;
+      }
+      body {
+        padding: 0em;
+        overflow: hidden;
+        background-color:#708090;
+        box-shadow: 0px 1px 50px #AFEEEE;
+        position: fixed;
+        width:100%;
+        height:50px;
+        top:0px;
+        color: white;
+        z-index: 100;
+      }
 
-		button:hover {
-    		background-color: #555555;
-    		color: white;
-        }
+      button {
+      background-color: #d1d1e0;
+      color: blue;
+      border: 2px solid #555555;
+      border-radius: 8px;
+      margin-left: 1em;
+      margin-bottom: 1em;
+      padding: 5px 10px;
+  }
 
-	      a:link {
-	      	color: black;
- 	   		text-decoration: none;
-		}
+  button:hover {
+      background-color: #555555;
+      color: white;
+      }
 
-		a:visited {
-			color: black;
-    		text-decoration: none;
-		}
-		
-		a:hover {
-			color: white;
-		}
-		
-      </style>
-      
-      
+      a:link {
+        color: black;
+      text-decoration: none;
+  }
+
+  a:visited {
+    color: black;
+      text-decoration: none;
+  }
+
+  a:hover {
+    color: white;
+  }
+
+    </style>
+
+
     </head>
     <body id="body">
+       <main>
       <h2>Welcome to JNT Messaging!</h2>
       <div>
         User Name: <input type="text" id="username" name="username">
@@ -57,18 +69,18 @@
       <div>
       <div id="output">
       <div>
-
+     </main>
 	<script>
 		document.getElementById('username').focus();
 		document.getElementById('username').select();
-	
+
       	document.getElementById("body").addEventListener("keyup", function(event) {
     		event.preventDefault();
     		if (event.keyCode == 13) {
         		document.getElementById("login").click();
     		}
 		});
-      
+
 		var button = document.getElementById('login');
 		button.onclick = function () {
     		var xhr = new XMLHttpRequest();
@@ -76,10 +88,10 @@
     		xhr.setRequestHeader('Content-Type', 'application/json');
     		xhr.onload = function() {
         		if (xhr.status === 200) {
-            		if (xhr.responseText) {
+            		if (xhr.responseText === 'true') {
               			window.location = "/createTweetHTML";
             		} else {
-              			document.getElementById('output').innerHTML="Login Incorrect.";
+              			document.getElementById('output').innerHTML="Login Incorrect. Please try again.";
               			document.getElementById('output').style.color = 'red';
               			document.getElementById('username').value='';
               			document.getElementById('password').value='';

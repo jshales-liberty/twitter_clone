@@ -282,5 +282,22 @@ public class TwitterDB {
 			return popularTweeters;
 		}
 	}
-
+	
+	public static boolean unfollowSomeone(int userId, int followsUserId) {
+		String sql = "DELETE FROM follower WHERE user_id = ? and follows_user_id = ?";
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, followsUserId);
+	
+			pstmt.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 }
