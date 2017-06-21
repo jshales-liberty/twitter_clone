@@ -3,6 +3,7 @@ package twitter;
 import java.sql.Timestamp;
 
 public class Tweet {
+	private int tweetId;
 	private String tweet;
 	private int createdById;
 	private String createdByName;
@@ -19,8 +20,9 @@ public class Tweet {
 
 	}
 	
-	public Tweet(String tweet, int createdById, String createdByName, String timestamp) {
+	public Tweet(String tweet, int tweetId, int createdById, String createdByName, String timestamp) {
 		this.tweet = tweet;
+		this.tweetId = tweetId;
 		this.createdById = createdById;
 		this.setCreatedByName(createdByName);
 		this.setCreateTimestamp(timestamp);
