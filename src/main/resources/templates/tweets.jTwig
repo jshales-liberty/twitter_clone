@@ -29,10 +29,12 @@
           .following_tweets {
             text-align: center;
             padding: 1em;
-            overflow: hidden;
+            overflow: scroll;
             background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
             height: 60vh;
+            width: 76%;
+            float: right;
           }
 
           .search {
@@ -44,7 +46,7 @@
             padding-left: 2em;
             padding-right: 2em;
             padding-bottom: 2em;
-            width: 175px;
+            width: 14%;
           }
 
 		div {
@@ -81,7 +83,7 @@
   			color: #fff;
   			border: none;
   			border-radius: 10px;
-  			box-shadow: 0 5px #999;
+  			box-shadow: 0 3px #999;
   			margin-left: 1em;
     		margin-right: 1em;
 		}
@@ -136,14 +138,16 @@
           <br>
         <section class = "new_Tweet">
           <div id="user_info">
-          	<p id="phrase">Hello {{username}}.  What's happening in your world?</p>
+          	<p id="phrase">Hello <span id="username">{{username}}</span>.  What's happening in your world?</p>
           </div>
           <textarea rows="1 " cols="120" id = "tweetTextArea"></textarea>
           <button type="submit" id="tweet">Tweet</button>
         </section>
           <br>
-          <aside id = "popular_tweeters">
+          <aside>
             <h3>Popular Tweeters</h3>
+            <div id = "popular_tweeters">
+            </div>
           </aside>
       <section class = "following_tweets">
       <table id = "following_tweets"> 
@@ -152,12 +156,13 @@
     </body>
     <script>
 /*Script to build popular tweeters aside */
-       {	
+       function buildTweeters(){	
         	let xhr = new XMLHttpRequest();
             xhr.open('GET', '/popularTweeters');
             	xhr.onload = function(evt) {
             	if (xhr.status === 200) {
               		var response = JSON.parse(xhr.responseText);
+              		document.getElementById("popular_tweeters").innerHTML = '';
               		for(var i = 0; i < response.length; i++){              		
               			var popularDiv = "popularDiv" + i;
               			var div = document.createElement('div');
@@ -170,7 +175,6 @@
               			btn.setAttribute('tweeter', response[i]);
                			
                			var hrefValue = "/userActivity?UserName='" + response[i] + "'";
-               			console.log(hrefValue); 
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i]);
         				createA.setAttribute('href', "http://google.com");
@@ -186,42 +190,69 @@
             };
             xhr.send();
 	    }
+	    buildTweeters();
+	    
 /* Script to build tweets */
-        {	
+        function buildTweets() {	
         	let xhr = new XMLHttpRequest();
             xhr.open('GET', '/tweetList');
             	xhr.onload = function(evt) {
             	if (xhr.status === 200) {
               		var response = JSON.parse(xhr.responseText);
                   	var table = document.getElementById("following_tweets");
+                  	table.innerHTML = '';
                   	var row = table.insertRow(0);
-                  	row.insertCell(0).innerHTML="<b>Tweet</b>";
-                    row.insertCell(1).innerHTML="<b>Author</b>";
-                    row.insertCell(2).innerHTML="<b>Post Date</b>";
-                    row.insertCell(3);
+                  	row.insertCell(0);
+                    row.insertCell(1).innerHTML="<b>Tweet</b>";
+                    row.insertCell(2).innerHTML="<b>Author</b>";
+                    row.insertCell(3).innerHTML="<b>Post Date</b>";
+                    row.insertCell(4);
                     
               		for(var i = 0; i < response.length; i++){            		
+              			var username = document.getElementById('username').innerHTML;
+              			
               			var tweet = "tweet" + i;
                     	var row = table.insertRow(i + 1);
-              			row.insertCell(0).innerHTML=response[i].tweet;
+              			
+              			var like = 'like';
+              			var unlike = 'unlike'
+              			var likeBtn = "likeBtn" + i;		
+              			var likeButton = document.createElement('BUTTON');
+              			var btnText = document.createTextNode('Like');
+              			likeButton.appendChild(btnText);
+              			likeButton.setAttribute('like', 'unlike');
+              			if(response[i].createdByName !== username) {
+              				row.insertCell(0).appendChild(likeButton);
+              			} else {
+              				row.insertCell(0).innerHTML = '';
+              			}
+              			
+              			row.insertCell(1).innerHTML=response[i].tweet;
               			
               			var hrefValue = "/userActivity?UserName='" + response[i].createdByName + "'";
-               			console.log(hrefValue); 
                			var createA = document.createElement('a');
         				var createAText = document.createTextNode(response[i].createdByName);
         				createA.setAttribute('href', "http://google.com");
         				createA.appendChild(createAText);
+        				var newCell = row.insertCell(2);
+        				newCell.appendChild(createA);
+              			
+                    	var date = response[i].createTimestamp.substring(0, 10);
+                    	var time = response[i].createTimestamp.substring(11, 19);
+                       	time = convertTime(time);
+                    	date = date + " " + time;
+              			row.insertCell(3).innerHTML=date;
               			
               			var unfollowBtn = "unfollowBtn" + i;		
               			var btn = document.createElement('BUTTON');
               			var btnText = document.createTextNode('Unfollow');
               			btn.appendChild(btnText);
               			btn.setAttribute('tweeter', response[i].createdByName);
-              			
-              			var newCell = row.insertCell(1);
-              			newCell.appendChild(createA);
-                    	row.insertCell(2).innerHTML=response[i].createTimestamp.substring(0,19)
-                    	row.insertCell(3).appendChild(btn);
+              			if(response[i].createdByName !== username) {
+                    		row.insertCell(4).appendChild(btn);
+                    	} else {
+                    		row.insertCell(4).innerHTML='';
+                    	}
                		};
                 } else {
                     console.log('Requesting tweets failed.  Returned status of ' + xhr.status);
@@ -229,6 +260,7 @@
             };
             xhr.send();
         }
+        buildTweets();
 
 /*Script to send tweet to database */        
     {
@@ -241,6 +273,8 @@
      			xhr.onload = function() {
          			if (xhr.status === 200) {
              			console.log(xhr.responseText);
+             			document.getElementById('tweetTextArea').value='';
+             			buildTweets();
          			} else if (xhr.status !== 200) {
              			console.log('Request failed.  Returned status of ' + xhr.status);
          			}
@@ -265,6 +299,8 @@
      			xhr.onload = function() {
          			if (xhr.status === 200) {
              			console.log(xhr.responseText);
+             			buildTweets();
+             			buildTweeters();
          			} else if (xhr.status !== 200) {
              			console.log('Request failed.  Returned status of ' + xhr.status);
          			}
@@ -276,6 +312,34 @@
     		}
     	});
     }
+
+/*Script to unfollow someone*/
+   	{
+   		let tableClick = document.getElementById('following_tweets');
+    	tableClick.addEventListener('click', function(evt) {
+    		if (evt.target.tagName === 'BUTTON') {
+    			let tweeter = evt.target.getAttribute('tweeter');
+
+ 				let xhr = new XMLHttpRequest();
+     			xhr.open('POST', '/submitUnfollow');
+     			xhr.setRequestHeader('Content-Type', 'application/json');
+     			xhr.onload = function() {
+         			if (xhr.status === 200) {
+             			console.log(xhr.responseText);
+             			buildTweets();
+             			buildTweeters();
+         			} else if (xhr.status !== 200) {
+             			console.log('Request failed.  Returned status of ' + xhr.status);
+         			}
+     			};
+     			
+     			let tweet = {follows: tweeter};
+     	
+     			xhr.send(JSON.stringify(tweet));
+    		}
+    	});
+    }
+
 /*Script to go to search for a  user's page */
    	{
    		let button = document.getElementById('search');
@@ -284,6 +348,14 @@
    			console.log(user);		
    		}
    	}
+   	
+   	function refreshTweets() {
+    	setInterval(function(){
+    		buildTweets();
+    		console.log("refresh");
+    	}, 30000);
+	}
+	refreshTweets();
    	
    	function startTime() {
  		var today = new Date();
@@ -302,6 +374,34 @@
     	return i;
 	}
    	
+   	function convertTime(time){
+   		time = time.split(':'); // convert to array
+
+		var hour = Number(time[0]);
+		var minutes = time[1];
+		var seconds = time[2];
+		
+		var timeValue;
+		var ampmValue;
+
+		if (hour > 0 && hour < 12) {
+  			timeValue= hour;
+  			ampmValue = 'AM'; 
+		} else if (hour > 12) {
+  			timeValue= (hour - 12);
+  			ampmValue = 'PM';
+		} else if (hour === 0) {
+  			timeValue = '12';
+  			ampmValue = 'AM';
+		} else if (hour === 12) {
+			timeValue = '12';
+			ampmValue = 'PM'; 
+		}
+		 
+		timeValue = timeValue + ":" + minutes +  " " + ampmValue;
+		return timeValue;
+		 
+   	}
    	
    </script>
    </html>
