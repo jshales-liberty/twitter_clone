@@ -151,7 +151,8 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 		
 		ArrayList<Tweet> tweetsList = new ArrayList<Tweet>();
 		
-		String sql = "SELECT t.TWEET 'Follows_Tweet', "
+		String sql = "SELECT t.tweet 'Follows_Tweet', "
+						+ "t.tweet_id 'Tweet_Id', "
 				  		+ "t.user_id 'Follows_User_Id', "
 				  		+ "ui.username 'Follows_User_Name', "
 				  		+ "t.create_timestamp 'Tweet_Timestamp' "
@@ -160,7 +161,8 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 				  	+ "where t.user_id in (select distinct FOLLOWS_USER_ID from FOLLOWER "
 				  	+ "where USER_ID = ?) " 
 				  	+ "union "
-				  	+ "select t.TWEET  'Follows_Tweet', "
+				  	+ "select t.tweet  'Follows_Tweet', "
+				  		+ "t.tweet_id 'Tweet_Id', "
 				  		+ "t.user_id 'Follows_User_Id', "
 				  		+ "ui.username 'Follows_User_Name', "
 				  		+ "t.create_timestamp 'Tweet_TimeStamp' " 
@@ -179,7 +181,9 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 			ResultSet rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
-				Tweet tweet = new Tweet(rs.getString("Follows_Tweet"), 
+				Tweet tweet = new Tweet(
+						rs.getString("Follows_Tweet"),
+						rs.getInt("Tweet_Id"),
 						rs.getInt("Follows_User_Id"), 
 						rs.getString("Follows_User_Name"), 
 						rs.getString("Tweet_Timestamp"));
@@ -230,5 +234,28 @@ public static ArrayList<Tweet> getTweetList(int userId) {
 			System.out.println(e.getMessage());
 			return false;
 		}
+	}
+	
+	public static boolean insertLike(int userId, int tweetId, int tweetUserId) {
+		String sql = "INSERT INTO likes(user_id, tweet_id, tweet_user_id, create_timestamp) VALUES(?,?,?,?)";
+
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String stringTimeStamp = timestamp.toString();
+
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmtInsert = conn.prepareStatement(sql);) {
+			
+			pstmtInsert.setInt(1, userId);				
+			pstmtInsert.setInt(2, tweetId);
+			pstmtInsert.setInt(3, tweetUserId);
+			pstmtInsert.setString(4, stringTimeStamp);
+			pstmtInsert.executeUpdate();
+			
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false; 
+		}
+
 	}
 }
