@@ -33,7 +33,7 @@
             background-color: #f0f0f5;
             box-shadow: 0px 1px 50px #5E5E5E;
             height: 60vh;
-            width: 76%;
+            width: 70%;
             float: right;
           }
 
@@ -41,7 +41,7 @@
             margin-left: 20px;
           }
 
-          aside {
+          #popular_tweeters_aside {
             float: left;
             padding-left: 2em;
             padding-right: 2em;
@@ -126,12 +126,11 @@
       </head>
     <body>
       <header id="header">
-          <br>
-          <form>
-            <input type="text" name ="search" id = "searchText">
-            <button type="submit" id="search">Search for User</button>
-            <button id="logoff"><a href = "/logoff" id="hrefLogoff">Logoff</a></button>
-          </form>
+          <div>
+            <input type="text" name ="search" id="search" class = "search">
+            <button id="searchbutton">Search</button>
+            <button id="logoff"><a href = "/logoff">Logoff</a></button>
+          </div>
       </header>
           <br>
           <br>
@@ -144,17 +143,22 @@
           <button type="submit" id="tweet">Tweet</button>
         </section>
           <br>
-          <aside>
+          <aside id="popular_tweeters_aside">
             <h3>Popular Tweeters</h3>
             <div id = "popular_tweeters">
             </div>
           </aside>
-      <section class = "following_tweets">
+      <section id="following_tweets_section" class = "following_tweets">
       <table id = "following_tweets"> 
       </table> 
       </section>
     </body>
     <script>
+/*Script to power the user lookup*/
+    var button = document.getElementById('searchbutton');
+      button.onclick = function () {
+      var link = document.getElementById("search").value;
+      window.location = "/userActivity?UserName=%27"+link+"%27";}
 /*Script to build popular tweeters aside */
        function buildTweeters(){	
         	let xhr = new XMLHttpRequest();
