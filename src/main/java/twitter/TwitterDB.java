@@ -30,6 +30,23 @@ public class TwitterDB {
 			return false;
 		}
 	}
+	
+	public static boolean checkExistence(String username) {
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmt_validate = conn.prepareStatement(
+						"Select count(*) as count from (Select username from user_info where username = ?)")) {
+			pstmt_validate.setString(1, username);
+			ResultSet rs = pstmt_validate.executeQuery();
+			if (rs.getInt("count") < 1) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 
 	public static User addUser(User u) {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -86,6 +103,8 @@ public class TwitterDB {
 	}
 
 	public static User findUser(String userName) {
+		if (!checkExistence(userName))
+		{return null;}
 		String selectSql = "SELECT * FROM user_info WHERE username = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -195,9 +214,11 @@ public class TwitterDB {
 						+ "t.tweet_id 'Tweet_Id', "
 				  		+ "t.user_id 'Follows_User_Id', "
 				  		+ "ui.username 'Follows_User_Name', "
-				  		+ "t.create_timestamp 'Tweet_Timestamp' "
+				  		+ "t.create_timestamp 'Tweet_Timestamp', "
+				  		+ "l.likes_id "
 				  	+ "FROM TWEET t "
 				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "Left JOIN likes l on l.tweet_id = t.tweet_id "
 				  	+ "where t.user_id in (select distinct FOLLOWS_USER_ID from FOLLOWER "
 				  	+ "where USER_ID = ?) " 
 				  	+ "union "
@@ -205,9 +226,11 @@ public class TwitterDB {
 				  		+ "t.tweet_id 'Tweet_Id', "
 				  		+ "t.user_id 'Follows_User_Id', "
 				  		+ "ui.username 'Follows_User_Name', "
-				  		+ "t.create_timestamp 'Tweet_TimeStamp' " 
+				  		+ "t.create_timestamp 'Tweet_TimeStamp', "
+				  		+ "l.likes_id "
 				  	+ "FROM tweet t "
 				  	+ "Left Join user_info ui on ui.user_id = t.user_id "
+				  	+ "Left JOIN likes l on l.tweet_id = t.tweet_id "
 				  	+ "where t.user_id = ? "
 				  	+ "ORDER BY t.create_timestamp DESC "
 				  	+ "LIMIT 100 ";
@@ -219,14 +242,22 @@ public class TwitterDB {
 			pstmt.setInt(2, userId);
 
 			ResultSet rs = pstmt.executeQuery();
-
+			String likeValue;
+			
 			while (rs.next()) {
+				if (rs.getString("Likes_ID") == null) {
+					likeValue = "not liked";
+				} else {
+					likeValue = "liked";
+				};
+				
 				Tweet tweet = new Tweet(
 						rs.getString("Follows_Tweet"),
 						rs.getInt("Tweet_Id"),
 						rs.getInt("Follows_User_Id"), 
 						rs.getString("Follows_User_Name"), 
-						rs.getString("Tweet_Timestamp"));
+						rs.getString("Tweet_Timestamp"),
+						likeValue);
 				tweetsList.add(tweet);
 			}
 			return tweetsList;
@@ -260,7 +291,9 @@ public class TwitterDB {
 						rs.getInt("tweet_id"),
 						rs.getInt("user_id"),
 						rs.getString("username"),
-						rs.getString("create_timestamp"));
+						rs.getString("create_timestamp"),
+						"");
+						
 				tweetsList.add(tweet);
 			}
 			return tweetsList;
@@ -309,9 +342,9 @@ public class TwitterDB {
 			return false;
 		}
 	}
-	
-	public static boolean insertLike(int userId, int tweetId, int tweetUserId) {
-		String sql = "INSERT INTO likes(user_id, tweet_id, tweet_user_id, create_timestamp) VALUES(?,?,?,?)";
+		
+	public static boolean submitLike(int userId, int tweetId){
+		String sql = "INSERT INTO likes(user_id, tweet_id, create_timestamp) VALUES(?,?,?)";
 
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String stringTimeStamp = timestamp.toString();
@@ -321,8 +354,7 @@ public class TwitterDB {
 			
 			pstmtInsert.setInt(1, userId);				
 			pstmtInsert.setInt(2, tweetId);
-			pstmtInsert.setInt(3, tweetUserId);
-			pstmtInsert.setString(4, stringTimeStamp);
+			pstmtInsert.setString(3, stringTimeStamp);
 			pstmtInsert.executeUpdate();
 			
 			return true;
@@ -330,6 +362,47 @@ public class TwitterDB {
 			System.out.println(e.getMessage());
 			return false; 
 		}
-
+	}
+	
+	public static boolean isTweetLiked(int userId, int tweetId) {
+		String sql = "select count(*) as count from likes where user_id = ? and tweet_id = ?";
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmt_validate = conn.prepareStatement(sql)) {
+			pstmt_validate.setInt(1, userId);
+			pstmt_validate.setInt(2, tweetId);
+			ResultSet rs = pstmt_validate.executeQuery();
+			int count = 0;
+			while (rs.next()){
+				count = rs.getInt("count");
+			}
+			if (count < 1) {
+				return false;
+			} else {
+				return true;
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
+	
+	public static boolean submitUnlike(int userId, int tweetId) {
+		String sql = "DELETE FROM likes WHERE user_id = ? and tweet_id = ?";
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				Statement stmt = conn.createStatement();
+				PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, tweetId);
+	
+			pstmt.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
 	}
 }

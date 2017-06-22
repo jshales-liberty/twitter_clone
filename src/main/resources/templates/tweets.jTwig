@@ -44,7 +44,7 @@
           #popular_tweeters_aside {
             float: left;
             padding-left: 2em;
-            padding-right: 2em;
+            
             padding-bottom: 2em;
             width: 14%;
           }
@@ -112,24 +112,19 @@
 			color: white;
 		}
 		
-		.search {
-			margin-right: 10em;
-		}
-		
 		#user_info {
 			text-align: center;
 			margin: 1px;
 		}
-		
-
         </style>
       </head>
     <body>
       <header id="header">
           <div>
-            <input type="text" name ="search" id="search" class = "search">
-            <button id="searchbutton">Search</button>
-            <button id="logoff"><a href = "/logoff">Logoff</a></button>
+            <input type="text" name ="search" id="search">
+            <button id="searchbutton">Lookup User</button>
+            <button id="tweetpage">Home</button>
+            <button id="logoff"><a href = "/logoff" id = "hrefLogoff">Logoff</a></button>
           </div>
       </header>
           <br>
@@ -139,7 +134,7 @@
           <div id="user_info">
           	<p id="phrase">Hello <span id="username">{{username}}</span>.  What's happening in your world?</p>
           </div>
-          <textarea rows="1 " cols="120" id = "tweetTextArea"></textarea>
+          <textarea rows="1 " cols="120" id = "tweetTextArea" maxlength="140"></textarea>
           <button type="submit" id="tweet">Tweet</button>
         </section>
           <br>
@@ -159,6 +154,10 @@
       button.onclick = function () {
       var link = document.getElementById("search").value;
       window.location = "/userActivity?UserName=%27"+link+"%27";}
+/*Script to go home*/
+    var button = document.getElementById('tweetpage');
+      button.onclick = function () {
+      window.location = "/createTweetHTML";}
 /*Script to build popular tweeters aside */
        function buildTweeters(){	
         	let xhr = new XMLHttpRequest();
@@ -221,11 +220,21 @@
               			var like = 'like';
               			var unlike = 'unlike'
               			var likeBtn = "likeBtn" + i;		
+     					var tweetLiked = false;
+     					
+     					
+     					console.log(response[i]);
+     					
+     					
               			var likeButton = document.createElement('BUTTON');
-              			var btnText = document.createTextNode('Like');
+              			if(response[i].liked === 'not liked') {
+              				var btnText = document.createTextNode('Like');
+              				likeButton.setAttribute('likeCheck', 'unliked');
+              			} else {
+              				var btnText = document.createTextNode('Unlike');
+              				likeButton.setAttribute('likeCheck', 'liked');
+              			}
               			likeButton.appendChild(btnText);
-              			likeButton.setAttribute('like', 'unlike');
-              			likeButton.setAttribute('likeCheck', 'likeButton');
               			likeButton.setAttribute('tweetId', response[i].tweetId);
               			if(response[i].createdByName !== username) {
               				row.insertCell(0).appendChild(likeButton);
@@ -359,14 +368,15 @@
    		}
    	}
    	
-   	function refreshTweets() {
+/*   	function refreshTweets() {
     	setInterval(function(){
     		buildTweets();
     		console.log("refresh");
     	}, 30000);
 	}
 	refreshTweets();
-   	   	
+ */
+  	   	
    	function convertTime(time){
    		time = time.split(':'); // convert to array
 
@@ -404,9 +414,10 @@
     			let tweeter = evt.target.getAttribute('tweeter');
 				let likeCheck = evt.target.getAttribute('likeCheck');
 				
-				if (unfollowCheck === 'likeButton') {
+				if (likeCheck === 'unliked') {
+					var tweetId = evt.target.getAttribute('tweetId');
  					let xhr = new XMLHttpRequest();
-     				xhr.open('POST', '/submitUnfollow');
+     				xhr.open('POST', '/submitLike');
      				xhr.setRequestHeader('Content-Type', 'application/json');
      				xhr.onload = function() {
          				if (xhr.status === 200) {
@@ -418,13 +429,32 @@
          				}
      				}
      			
-     				let tweet = {follows: tweeter};
+     				let tweet = {tweetId: tweetId};
+     	
+     				xhr.send(JSON.stringify(tweet));
+    			}
+    			
+    			if (likeCheck === 'liked') {
+					var tweetId = evt.target.getAttribute('tweetId');
+ 					let xhr = new XMLHttpRequest();
+     				xhr.open('POST', '/submitUnlike');
+     				xhr.setRequestHeader('Content-Type', 'application/json');
+     				xhr.onload = function() {
+         				if (xhr.status === 200) {
+             				console.log(xhr.responseText);
+             				buildTweets();
+             				buildTweeters();
+         				} else if (xhr.status !== 200) {
+             				console.log('Request failed.  Returned status of ' + xhr.status);
+         				}
+     				}
+     			
+     				let tweet = {tweetId: tweetId};
      	
      				xhr.send(JSON.stringify(tweet));
     			}
     		}
 		});
     }
-
    </script>
    </html>
