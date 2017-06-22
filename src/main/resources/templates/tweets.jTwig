@@ -217,11 +217,21 @@
               			var like = 'like';
               			var unlike = 'unlike'
               			var likeBtn = "likeBtn" + i;		
+     					var tweetLiked = false;
+     					
+     					
+     					console.log(response[i]);
+     					
+     					
               			var likeButton = document.createElement('BUTTON');
-              			var btnText = document.createTextNode('Like');
+              			if(response[i].liked === 'not liked') {
+              				var btnText = document.createTextNode('Like');
+              				likeButton.setAttribute('likeCheck', 'unliked');
+              			} else {
+              				var btnText = document.createTextNode('Unlike');
+              				likeButton.setAttribute('likeCheck', 'liked');
+              			}
               			likeButton.appendChild(btnText);
-              			likeButton.setAttribute('like', 'unlike');
-              			likeButton.setAttribute('likeCheck', 'likeButton');
               			likeButton.setAttribute('tweetId', response[i].tweetId);
               			if(response[i].createdByName !== username) {
               				row.insertCell(0).appendChild(likeButton);
@@ -355,14 +365,15 @@
    		}
    	}
    	
-   	function refreshTweets() {
+/*   	function refreshTweets() {
     	setInterval(function(){
     		buildTweets();
     		console.log("refresh");
     	}, 30000);
 	}
 	refreshTweets();
-   	   	
+ */
+  	   	
    	function convertTime(time){
    		time = time.split(':'); // convert to array
 
@@ -400,9 +411,10 @@
     			let tweeter = evt.target.getAttribute('tweeter');
 				let likeCheck = evt.target.getAttribute('likeCheck');
 				
-				if (unfollowCheck === 'likeButton') {
+				if (likeCheck === 'unliked') {
+					var tweetId = evt.target.getAttribute('tweetId');
  					let xhr = new XMLHttpRequest();
-     				xhr.open('POST', '/submitUnfollow');
+     				xhr.open('POST', '/submitLike');
      				xhr.setRequestHeader('Content-Type', 'application/json');
      				xhr.onload = function() {
          				if (xhr.status === 200) {
@@ -414,13 +426,32 @@
          				}
      				}
      			
-     				let tweet = {follows: tweeter};
+     				let tweet = {tweetId: tweetId};
+     	
+     				xhr.send(JSON.stringify(tweet));
+    			}
+    			
+    			if (likeCheck === 'liked') {
+					var tweetId = evt.target.getAttribute('tweetId');
+ 					let xhr = new XMLHttpRequest();
+     				xhr.open('POST', '/submitUnlike');
+     				xhr.setRequestHeader('Content-Type', 'application/json');
+     				xhr.onload = function() {
+         				if (xhr.status === 200) {
+             				console.log(xhr.responseText);
+             				buildTweets();
+             				buildTweeters();
+         				} else if (xhr.status !== 200) {
+             				console.log('Request failed.  Returned status of ' + xhr.status);
+         				}
+     				}
+     			
+     				let tweet = {tweetId: tweetId};
      	
      				xhr.send(JSON.stringify(tweet));
     			}
     		}
 		});
     }
-
    </script>
    </html>

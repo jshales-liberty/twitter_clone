@@ -8,6 +8,7 @@ public class Tweet {
 	private int createdById;
 	private String createdByName;
 	private String createTimestamp;
+	private String liked;
 	
 	public Tweet(String tweet, int createdById, String createdByName) {
 		this.tweet = tweet;
@@ -20,12 +21,13 @@ public class Tweet {
 
 	}
 	
-	public Tweet(String tweet, int tweetId, int createdById, String createdByName, String timestamp) {
+	public Tweet(String tweet, int tweetId, int createdById, String createdByName, String timestamp, String liked) {
 		this.tweet = tweet;
 		this.tweetId = tweetId;
 		this.createdById = createdById;
 		this.setCreatedByName(createdByName);
 		this.setCreateTimestamp(timestamp);
+		this.liked = liked;
 	}
 
 	public String getTweet() {

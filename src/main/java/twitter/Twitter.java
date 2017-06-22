@@ -123,6 +123,7 @@ public class Twitter {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			return gson.toJson(TwitterDB.getUserTweets(id));
 		});
+		
 		post("/submitUnfollow", (req, res) -> {
 			String body = req.body();
 
@@ -136,8 +137,39 @@ public class Twitter {
 					userBeingUnfollowed.getId());
 
 		});
-	}
+		
+		post("/submitLike", (req, res) -> {
+			String body = req.body();
 
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(body).getAsJsonObject();
+
+			return TwitterDB.submitLike(
+					((User) req.session().attribute("user")).getId(),
+					obj.get("tweetId").getAsInt());
+		});
+		
+		post("/isTweetLiked", (req, res) -> {
+			String body = req.body();
+			
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(body).getAsJsonObject();
+			
+			return TwitterDB.isTweetLiked(((User) req.session().attribute("user")).getId(),
+					obj.get("tweetId").getAsInt());
+		});
+		
+		post("/submitUnlike", (req, res) -> {
+			String body = req.body();
+
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(body).getAsJsonObject();
+
+			return TwitterDB.submitUnlike(((User) req.session().attribute("user")).getId(),
+					obj.get("tweetId").getAsInt());
+		});
+	}
+	
 	public static String createLoginHTML() {
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/login.jTwig");
