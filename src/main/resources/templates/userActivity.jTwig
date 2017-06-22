@@ -95,11 +95,11 @@
 	  	<header>
       <main>
           <br>
-          <form method = "POST">
-            <input type="text" name ="search" class = "search">
-            <button type="submit" id="search">Search</button>
+          <div>
+            <input type="text" name ="search" id="search" class = "search">
+            <button id="searchbutton">Search</button>
             <button id="logoff"><a href = "/logoff">Logoff</a></button>
-          </form>
+          </div>
       	</header>
       	<br>
       	<br>
@@ -131,5 +131,14 @@
       		{% endfor %}
       		</table>
       	</section>
+      	<script type="text/javascript">
+
+      	var button = document.getElementById('searchbutton');
+    	button.onclick = function () {
+			var link = document.getElementById("search").value;
+			window.location = "/userActivity?UserName=%27"+link+"%27";}
+
+
+    		</script>
     </body>
    </html>

@@ -91,7 +91,6 @@ public class TwitterDB {
 		try (Connection conn = DriverManager.getConnection(DB_URL);
 				PreparedStatement pstmtSelect = conn
 						.prepareStatement(selectSql)) {
-			System.out.println(userName);
 			pstmtSelect.setString(1, userName);
 			ResultSet rs = pstmtSelect.executeQuery();
 			while (rs.next()) {
