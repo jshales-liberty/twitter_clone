@@ -120,8 +120,6 @@
 			text-align: center;
 			margin: 1px;
 		}
-		
-
         </style>
       </head>
     <body>
@@ -139,7 +137,7 @@
           <div id="user_info">
           	<p id="phrase">Hello <span id="username">{{username}}</span>.  What's happening in your world?</p>
           </div>
-          <textarea rows="1 " cols="120" id = "tweetTextArea"></textarea>
+          <textarea rows="1 " cols="120" id = "tweetTextArea" maxlength="140"></textarea>
           <button type="submit" id="tweet">Tweet</button>
         </section>
           <br>
