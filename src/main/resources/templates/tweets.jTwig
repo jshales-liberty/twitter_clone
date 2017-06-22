@@ -124,7 +124,7 @@
             <input type="text" name ="search" id="search">
             <button id="searchbutton">Lookup User</button>
             <button id="tweetpage">Home</button>
-            <button id="logoff"><a href = "/logoff">Logoff</a></button>
+            <button id="logoff"><a href = "/logoff" id = "hrefLogoff">Logoff</a></button>
           </div>
       </header>
           <br>
