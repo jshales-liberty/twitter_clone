@@ -112,9 +112,14 @@ public class Twitter {
 			String user = req.queryParams("UserName");
 			user = user.replace("\'", "");
 			User newuser = TwitterDB.findUser(user);
-			int id = newuser.getId();
-			return createUserPage(user, TwitterDB.getUserTweets(id),
-					TwitterDB.getUserFollows(id));
+			if (newuser == null) {
+				return createTweetPageHTML(
+						((User) req.session().attribute("user")).getUsername());
+			} else {
+				int id = newuser.getId();
+				return createUserPage(user, TwitterDB.getUserTweets(id),
+						TwitterDB.getUserFollows(id));
+			}
 		});
 
 		get("/userTweets", (req, res) -> {

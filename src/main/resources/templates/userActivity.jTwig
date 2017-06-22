@@ -4,26 +4,17 @@
 	  	<title>{{username}} Feed Page</title>
 
 	  	<style>
-	        header {
-	            background-color:#87CEFA;
-	            width:100%;
-	            height:60px;
-	            box-shadow: 0px 1px 50px #5E5E5E;
-	            position:fixed;
-	            top:0px;
-	            color: white;
-	            z-index: 100;
+    header {
+            background-color:#262626;
+            width:100%;
+            height:50px;
+            box-shadow: 0px 1px 50px #5E5E5E;
+            position:fixed;
+            top:0px;
+            color: white;
+            z-index: 100;
+          }
 
-              background-image: url("https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSKmdyi6krntZffimURj6CoJQyar7HD7Q0O-aHc43rLL8NaQMXP");
-              background-repeat: no-repeat;
-              background-position: right center;
-              background-size: 10% 98%;
-
-	        }
-          main {
-
-
-                }
           aside {
 	            float: left;
     	        padding-left: 2em;
@@ -38,28 +29,46 @@
 			}
 
 			button {
-  				display: inline-block;
-	  			font-size: 16px;
-	  			cursor: pointer;
-	  			text-align: center;
-	  			text-decoration: none;
-	  			outline: none;
-	  			background-color: black;
-	  			color: #fff;
-	  			border: none;
-	  			border-radius: 10px;
-	  			box-shadow: 0 5px #999;
-	  			margin-left: 1em;
-	    		margin-right: 1em;
-			}
+  			display: inline-block;
+  			font-size: 16px;
+  			cursor: pointer;
+  			text-align: center;
+  			text-decoration: none;
+  			outline: none;
+  			background-color: #53575e;
+  			color: #fff;
+  			border: none;
+  			border-radius: 10px;
+  			box-shadow: 0 3px #999;
+  			margin-left: 1em;
+    		margin-right: 1em;
+		}
 
-			button:hover {background-color: #3e8e41}
+div {
+			margin-top: 1em;
+		}
+		button:hover {background-color: #3e8e41}
 
-			button:active {
-	  			background-color: #3e8e41;
-	  			box-shadow: 0 5px #666;
-	  			transform: translateY(4px);
-	  		}
+		button:active {
+  			background-color: #3e8e41;
+  			box-shadow: 0 5px #666;
+  			transform: translateY(4px);
+  		}
+
+		table{
+  			border-collapse: collapse;
+  			width: 100%;
+		}
+		
+		th, td {
+ 		   height: 40px;
+ 		   
+		}
+		
+		tr:nth-child(even) {
+			background-color: #d1d1e0;
+		}
+
 
 		    a:link {
 		      	color: blue;
@@ -86,6 +95,14 @@
 	            height: 80vh;
 	        }
 
+	                  #follows {
+            float: left;
+            padding-left: 2em;
+            
+            padding-bottom: 2em;
+            width: 14%;
+          }
+
 	        input {
 	        	margin-left: 1em;
 	        }
@@ -94,10 +111,10 @@
     <body>
 	  	<header>
       <main>
-          <br>
           <div>
-            <input type="text" name ="search" id="search" class = "search">
-            <button id="searchbutton">Search</button>
+            <input type="text" name ="search" id="search">
+            <button id="searchbutton">Lookup User</button>
+            <button id="tweetpage">Home</button>
             <button id="logoff"><a href = "/logoff">Logoff</a></button>
           </div>
       	</header>
@@ -106,14 +123,11 @@
       	<br>
 	  	<aside id = "follows">
             <h3>{{username}} Follows</h3>
-        	<table class = "following_tweets" id = "following_tweets">
-        	<tr><td><b>Following</b></td></tr>
+        	<div class = "following_tweets" id = "following_tweets">
         	{% for f in follows %}
-        	<tr>
-        	<td><a href="/userActivity?UserName='{{f}}'">{{f}}
-        	</a></td></tr>
+        	<a href="/userActivity?UserName='{{f}}'">{{f}}<br>
+        	</a>
         	{% endfor %}
-      		</table>
         </aside>
         <section id = "activityList">
       		<h2>{{username}} Activities</h2>
@@ -137,6 +151,10 @@
     	button.onclick = function () {
 			var link = document.getElementById("search").value;
 			window.location = "/userActivity?UserName=%27"+link+"%27";}
+
+			    var homebutton = document.getElementById('tweetpage');
+      homebutton.onclick = function () {
+      window.location = "/createTweetHTML";}
 
 
     		</script>
