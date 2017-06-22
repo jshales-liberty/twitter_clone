@@ -44,7 +44,7 @@
           #popular_tweeters_aside {
             float: left;
             padding-left: 2em;
-            padding-right: 2em;
+            
             padding-bottom: 2em;
             width: 14%;
           }
@@ -112,10 +112,6 @@
 			color: white;
 		}
 		
-		.search {
-			margin-right: 10em;
-		}
-		
 		#user_info {
 			text-align: center;
 			margin: 1px;
@@ -127,8 +123,9 @@
     <body>
       <header id="header">
           <div>
-            <input type="text" name ="search" id="search" class = "search">
-            <button id="searchbutton">Search</button>
+            <input type="text" name ="search" id="search">
+            <button id="searchbutton">Lookup User</button>
+            <button id="tweetpage">Home</button>
             <button id="logoff"><a href = "/logoff">Logoff</a></button>
           </div>
       </header>
@@ -159,6 +156,10 @@
       button.onclick = function () {
       var link = document.getElementById("search").value;
       window.location = "/userActivity?UserName=%27"+link+"%27";}
+/*Script to go home*/
+    var button = document.getElementById('tweetpage');
+      button.onclick = function () {
+      window.location = "/createTweetHTML";}
 /*Script to build popular tweeters aside */
        function buildTweeters(){	
         	let xhr = new XMLHttpRequest();

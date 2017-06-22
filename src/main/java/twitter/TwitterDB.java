@@ -30,6 +30,23 @@ public class TwitterDB {
 			return false;
 		}
 	}
+	
+	public static boolean checkExistence(String username) {
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmt_validate = conn.prepareStatement(
+						"Select count(*) as count from (Select username from user_info where username = ?)")) {
+			pstmt_validate.setString(1, username);
+			ResultSet rs = pstmt_validate.executeQuery();
+			if (rs.getInt("count") < 1) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 
 	public static User addUser(User u) {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -86,6 +103,8 @@ public class TwitterDB {
 	}
 
 	public static User findUser(String userName) {
+		if (!checkExistence(userName))
+		{return null;}
 		String selectSql = "SELECT * FROM user_info WHERE username = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
