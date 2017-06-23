@@ -112,13 +112,18 @@ public class Twitter {
 			String user = req.queryParams("UserName");
 			user = user.replace("\'", "");
 			User newuser = TwitterDB.findUser(user);
-			if (newuser == null) {
-				return createTweetPageHTML(
-						((User) req.session().attribute("user")).getUsername());
+
+			if (((User) req.session().attribute("user")) == null) {
+				return createLoginHTML();
 			} else {
-				int id = newuser.getId();
-				return createUserPage(user, TwitterDB.getUserTweets(id),
-						TwitterDB.getUserFollows(id));
+				if (newuser == null) {
+					return createTweetPageHTML(
+						((User) req.session().attribute("user")).getUsername());
+				} else {
+					int id = newuser.getId();
+					return createUserPage(user, TwitterDB.getUserTweets(id),
+						TwitterDB.getUserFollows(id), ((User) req.session().attribute("user")).getId());
+				}
 			}
 		});
 
@@ -173,6 +178,11 @@ public class Twitter {
 			return TwitterDB.submitUnlike(((User) req.session().attribute("user")).getId(),
 					obj.get("tweetId").getAsInt());
 		});
+		
+		get("/getSessionUser", (req, res) -> {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return gson.toJson(((User) req.session().attribute("user")).getUsername());
+		});
 	}
 	
 	public static String createLoginHTML() {
@@ -192,11 +202,14 @@ public class Twitter {
 	}
 
 	public static String createUserPage(String username,
-			ArrayList<Tweet> tweets, ArrayList<String> follows) {
+			ArrayList<Tweet> tweets, ArrayList<String> follows, int sessionUser) {
+		
+		int alreadyFollows = TwitterDB.alreadyFollows(username, sessionUser);
+		
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/userActivity.jTwig");
 		JtwigModel model = JtwigModel.newModel().with("username", username)
-				.with("tweets", tweets).with("follows", follows);
+				.with("tweets", tweets).with("follows", follows).with("alreadyFollows", alreadyFollows);
 
 		return template.render(model);
 	}
@@ -205,7 +218,6 @@ public class Twitter {
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel().with("username", username);
-		;
 
 		return template.render(model);
 	}

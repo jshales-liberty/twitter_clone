@@ -405,4 +405,25 @@ public class TwitterDB {
 			return false;
 		}
 	}
+	
+	public static int alreadyFollows(String userName, int sessionUser) {
+		String sql = "select count(user_id) 'count' from follower "
+					 + "where follower.user_id = ? "
+					 + "and follower.follows_user_id in "
+					 + "(select user_id from user_info where username = ?)";
+		int count = 0;
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+				PreparedStatement pstmt_validate = conn.prepareStatement(sql)) {
+			pstmt_validate.setInt(1, sessionUser);
+			pstmt_validate.setString(2, userName);
+			ResultSet rs = pstmt_validate.executeQuery();
+			while (rs.next()){
+				count = rs.getInt("count");	
+			}
+			return count;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return 0;
+		}
+	}
 }
