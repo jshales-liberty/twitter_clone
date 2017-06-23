@@ -1,7 +1,7 @@
   <!DOCTYPE html>
   <html>
     <head>
-        <title>JNT Messaging Tweets</title>
+        <title>PUFF Messaging Tweets</title>
         <style>
            header {
             background-color:#262626;
@@ -158,10 +158,12 @@
       button.onclick = function () {
       var link = document.getElementById("search").value;
       window.location = "/userActivity?UserName=%27"+link+"%27";}
+
 /*Script to go home*/
     var button = document.getElementById('tweetpage');
       button.onclick = function () {
       window.location = "/createTweetHTML";}
+
 /*Script to build popular tweeters aside */
        function buildTweeters(){	
         	let xhr = new XMLHttpRequest();
@@ -226,10 +228,6 @@
               			var unlike = 'unlike'
               			var likeBtn = "likeBtn" + i;		
      					var tweetLiked = false;
-     					
-     					
-     					console.log(response[i]);
-     					
      					
               			var likeButton = document.createElement('BUTTON');
               			if(response[i].liked === 'not liked') {
@@ -369,7 +367,7 @@
 /*Script to go to search for a  user's page */
    	{
    		let button = document.getElementById('search');
-		button.onclick = function () {
+		button.onclick = function (evt) {
    			let user = evt.target.getAttribute('searchText').value;
    			console.log(user);		
    		}

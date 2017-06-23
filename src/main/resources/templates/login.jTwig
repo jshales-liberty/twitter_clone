@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <title>JNT Messaging Login</title>
+      <title>PUFF Messaging Login</title>
       <style>
       main {
         background-image: url("https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQAZiImJLMRBAA9PGzPGIG7KgIIXrqK5edXYcnrmIe_wh1elKMi");
@@ -62,7 +62,7 @@
     </head>
     <body id="body">
        <main>
-      <h2>Welcome to JNT Messaging!</h2>
+      <h2>Welcome to PUFF Messaging!</h2>
       <div>
         <br>
         <br>

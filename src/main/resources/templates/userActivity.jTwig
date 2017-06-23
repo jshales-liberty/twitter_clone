@@ -105,6 +105,28 @@
 
 	        input {
 	        	margin-left: 1em;
+	        	
+	        }
+	        
+	        .personalInfo {
+	        	margin-right: 1em;
+	        }
+	        
+	        #textArea {
+	        	float:right;
+	        	margin-right: 15em;
+	        }
+	        
+	        #personalInfo {
+	            text-align: center;
+	            padding: 1em;
+	            overflow: hidden;
+	            background-color: #f0f0f5;
+	            box-shadow: 0px 1px 50px #5E5E5E;
+	        }
+	        
+	        #follow {
+	        
 	        }
 	    </style>
     </head>
@@ -130,33 +152,124 @@
         	{% endfor %}
         </aside>
         <section id = "activityList">
-      		<h2>{{username}} Activities</h2>
+      		<div id="follow" alreadyFollows={{alreadyFollows}}></div>
+      		<h2 id = "header" user="{{username}}">{{username}} Activities</h2>
+
       		<table class = "tweets" id = "tweets">
-      		<tr><td><b>Tweet</b></td>
-      		<td><b>Author</b></td>
-      		<td><b>Post Date</b></td>
-      		</tr>
-      		{% for t in tweets %}
-      		<tr>
-      		<td>{{t.tweet}}</td>
-      		<td>{{t.createdByName}}</td>
-      		<td>{{t.createTimestamp}}</td>
-      		</tr>
-      		{% endfor %}
+      			<tr>
+      				<td><b>Tweet</b></td>
+      				<td><b>Author</b></td>
+      				<td><b>Post Date</b></td>
+      			</tr>
+      			
+      			{% for t in tweets %}
+      				<tr>
+      					<td>{{t.tweet}}</td>
+      					<td>{{t.createdByName}}</td>
+      					<td>{{t.createTimestamp}}</td>
+      				</tr>
+      			{% endfor %}
       		</table>
       	</section>
       	<script type="text/javascript">
 
-      	var button = document.getElementById('searchbutton');
-    	button.onclick = function () {
-			var link = document.getElementById("search").value;
-			window.location = "/userActivity?UserName=%27"+link+"%27";}
-
-			    var homebutton = document.getElementById('tweetpage');
-      homebutton.onclick = function () {
-      window.location = "/createTweetHTML";}
-
-
-    		</script>
+	      	var button = document.getElementById('searchbutton');
+	    	button.onclick = function () {
+				var link = document.getElementById("search").value;
+				window.location = "/userActivity?UserName=%27"+link+"%27";
+			}
+	
+			var homebutton = document.getElementById('tweetpage');
+	      	homebutton.onclick = function () {
+	      		window.location = "/createTweetHTML";
+	      	}
+	      	
+/*Get session user name */
+	       function getSessionUser(){	
+	        	let xhr = new XMLHttpRequest();
+	            xhr.open('GET', '/getSessionUser');
+            	xhr.onload = function(evt) {
+            		if (xhr.status === 200) {
+              			var response = JSON.parse(xhr.responseText);
+						var el = document.getElementById("header");
+						var user = el.getAttribute("user");
+              			
+              			if(response !== user) {		
+              				var element = document.getElementById("follow");
+              				var alreadyFollows = element.getAttribute("alreadyFollows");
+              				
+              				var btn = document.createElement('BUTTON');
+              				btn.setAttribute("id", "followButton");
+              				btn.setAttribute("onclick", "follow()");
+              				if (alreadyFollows === '1') {
+              					var text = "Unfollow " + user;
+              				} else {
+              				    var text = "Follow " + user;
+              				}
+              				
+              				var btnText = document.createTextNode(text);
+              				btn.appendChild(btnText);
+           					document.getElementById("follow").appendChild(btn);
+              			}            
+              			 		
+                	} else {
+                    	console.log('Request for session user failed.  Returned status of ' + xhr.status);
+                    }
+                }
+	            xhr.send();
+		    }
+		    getSessionUser();
+		    
+/*Function to follow/unfollow someone */		    
+		    function follow() {
+		    	var element = document.getElementById("follow");
+              	var alreadyFollows = element.getAttribute("alreadyFollows");
+  				
+  				if (alreadyFollows === '1') {
+  					console.log("unfollow");
+  					var el = document.getElementById("header");
+					var user = el.getAttribute("user");
+  					
+  					var xhr = new XMLHttpRequest();
+     				xhr.open('POST', '/submitUnfollow');
+     				xhr.setRequestHeader('Content-Type', 'application/json');
+     				xhr.onload = function() {
+         				if (xhr.status === 200) {
+             				console.log(xhr.responseText);
+             				window.location.reload()
+         				} else if (xhr.status !== 200) {
+             				console.log('Request failed.  Returned status of ' + xhr.status);
+         				}
+         			}
+         			console.log(user);
+         			var tweet = {follows: user};
+     	
+     				xhr.send(JSON.stringify(tweet));
+         			
+  				} else {
+  				    console.log("follow")
+  				    var el = document.getElementById("header");
+					var user = el.getAttribute("user");
+  				    
+  				    var xhrFollow = new XMLHttpRequest();
+	     			xhrFollow.open('POST', '/submitFollow');
+	     			xhrFollow.setRequestHeader('Content-Type', 'application/json');
+	     			xhrFollow.onload = function() {
+	         			if (xhrFollow.status === 200) {
+	             			console.log(xhrFollow.responseText);
+	             			window.location.reload()
+	         			} else if (xhr.status !== 200) {
+	             			console.log('Request failed.  Returned status of ' + xhr.status);
+	         			}
+	     			};
+	     			console.log(user);
+	     			
+	     			var tweet = {follows: user};
+	     	
+	     			xhrFollow.send(JSON.stringify(tweet));
+	  				}
+		    }
+	      	
+   		</script>
     </body>
    </html>

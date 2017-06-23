@@ -2,7 +2,7 @@
 <html>
 
     <head>
-      <title>JNT Messaging New User</title>
+      <title>PUFF Messaging New User</title>
       <style>
 html {
   margin: 0;
@@ -77,7 +77,7 @@ html {
     <body id="body">
       <br>
     </br>
- <nav> <center>Weclome to JNT Messaging!</center></nav>
+ <nav> <center>Weclome to PUFF Messaging!</center></nav>
  <main>
 
       <h2>Create New User</h2>
