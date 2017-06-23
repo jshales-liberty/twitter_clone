@@ -188,7 +188,7 @@ public class TwitterDB {
 	public static ArrayList<String> getUserFollows(int pageUserId) {
 		  
 			ArrayList<String> followers = new ArrayList<String>();
-			String sql = "SELECT DISTINCT u.username FROM Follower f Left join user_info u on f.follows_user_id = u.user_id Where f.user_id = ? LIMIT 8;";
+			String sql = "SELECT DISTINCT u.username FROM Follower f Left join user_info u on f.follows_user_id = u.user_id Where f.user_id = ? LIMIT 15;";
 
 			try (Connection conn = DriverManager.getConnection(DB_URL);
 					Statement stmt = conn.createStatement();
@@ -305,7 +305,7 @@ public class TwitterDB {
 
 	public static ArrayList<String> getPopularTweeters(int userId) {
 		ArrayList<String> popularTweeters = new ArrayList<String>();
-		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 8";
+		String sql = "SELECT * FROM user_info WHERE NOT user_id IN (SELECT follows_user_id FROM follower WHERE user_id = ?)	AND NOT user_id = ? LIMIT 15";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL);
 				Statement stmt = conn.createStatement();
