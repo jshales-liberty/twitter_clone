@@ -112,6 +112,10 @@
 			color: white;
 		}
 		
+    .redbox {
+      border: solid red 4px;
+    }
+
 		#user_info {
 			text-align: center;
 			margin: 1px;
@@ -121,7 +125,7 @@
     <body>
       <header id="header">
           <div>
-            <input type="text" name ="search" id="search">
+            <input type="text" name ="search" id="search" {% if badsearch %}class="redbox"{% endif %}>
             <button id="searchbutton">Lookup User</button>
             <button id="tweetpage">Home</button>
             <button id="logoff"><a href = "/logoff" id = "hrefLogoff">Logoff</a></button>
@@ -209,7 +213,8 @@
                     row.insertCell(1).innerHTML="<b>Tweet</b>";
                     row.insertCell(2).innerHTML="<b>Author</b>";
                     row.insertCell(3).innerHTML="<b>Post Date</b>";
-                    row.insertCell(4);
+                    row.insertCell(4).innerHTML;
+                    row.insertCell(5).innerHTML = "<b>Number of Likes</b>"
                     
               		for(var i = 0; i < response.length; i++){            		
               			var username = document.getElementById('username').innerHTML;
@@ -243,6 +248,7 @@
               			}
               			
               			row.insertCell(1).innerHTML=response[i].tweet;
+
               			
               			var hrefValue = "/userActivity?UserName='" + response[i].createdByName + "'";
                			var createA = document.createElement('a');
@@ -269,6 +275,7 @@
                     	} else {
                     		row.insertCell(4).innerHTML='';
                     	}
+                    row.insertCell(5).innerHTML=response[i].like_count;
                		};
                 } else {
                     console.log('Requesting tweets failed.  Returned status of ' + xhr.status);

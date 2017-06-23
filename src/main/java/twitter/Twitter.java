@@ -15,6 +15,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import spark.Session;
+
 public class Twitter {
 
 	public static void main(String[] args) {
@@ -56,12 +58,14 @@ public class Twitter {
 		});
 
 		get("/createTweetHTML", (request, response) -> {
-			if (((User) request.session().attribute("user")) == null) {
+			Session s = request.session();
+			User user = s.attribute("user");
+			if (user == null) {
 				return createLoginHTML();
 			} else {
-				return createTweetPageHTML(
-						((User) request.session().attribute("user"))
-								.getUsername());
+				boolean badsearch = s.attribute("badsearch") != null;
+				s.removeAttribute("badsearch");
+				return createTweetPageHTML(user.getUsername(), badsearch);
 			}
 		});
 
@@ -109,15 +113,17 @@ public class Twitter {
 		});
 
 		get("/userActivity", (req, res) -> {
-			String user = req.queryParams("UserName");
-			user = user.replace("\'", "");
-			User newuser = TwitterDB.findUser(user);
+			String username = req.queryParams("UserName");
+			username = username.replace("\'", "");
+			User newuser = TwitterDB.findUser(username);
 			if (newuser == null) {
-				return createTweetPageHTML(
-						((User) req.session().attribute("user")).getUsername());
+				req.session().attribute("badsearch", true);
+				res.redirect("/createTweetHTML");
+				return "";
 			} else {
+				req.session().removeAttribute("badsearch");
 				int id = newuser.getId();
-				return createUserPage(user, TwitterDB.getUserTweets(id),
+				return createUserPage(username, TwitterDB.getUserTweets(id),
 						TwitterDB.getUserFollows(id));
 			}
 		});
@@ -201,11 +207,12 @@ public class Twitter {
 		return template.render(model);
 	}
 
-	public static String createTweetPageHTML(String username) {
+	public static String createTweetPageHTML(String username, boolean badsearch) {
 		JtwigTemplate template = JtwigTemplate
 				.classpathTemplate("templates/tweets.jTwig");
 		JtwigModel model = JtwigModel.newModel().with("username", username);
-		;
+		//add another with for is user
+		model.with("badsearch", badsearch);
 
 		return template.render(model);
 	}
