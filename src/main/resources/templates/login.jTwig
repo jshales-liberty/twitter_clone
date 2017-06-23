@@ -74,8 +74,9 @@
         <br>
         <button type="submit" id= "login">Log In</button>
         <button type="submit" value="newUser"><a href = "/createUser">New User</a></button>
-      <div>
+      </div>
       <div id="output">
+      </div>
       <div>
       <br>
       <br>
@@ -106,7 +107,7 @@
       <br>
       <br>
       <br>
-
+	 </div>
      </main>
 	<script>
 		document.getElementById('username').focus();
